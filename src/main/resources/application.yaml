@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: cnpj-analyzr-spring-app
+  datasource:
+    url: jdbc:postgresql://172.17.0.2:5432/cnpjdb
+    username: cnpjuser
+    password: cnpjpass
+    driver-class-name: org.postgresql.Driver
+management:
+  endpoints:
+    web:
+      cors:
+        allowed-origins: http://localhost:4200
+        allowed-methods: GET,POST
+
+owner-email: viniciusbaleia1999@gmail.com
+
+mailgun:
+  url: ${MAILGUN_URL}
+  apiKey: ${MAILGUN_APIKEY}
+  # email to be the host of the email sent by the service
+  hostFrom: ItiMenu <support@itimenu.app>
+  
