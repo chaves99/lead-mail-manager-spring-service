@@ -1,25 +1,23 @@
-server:
-  port: 8081
 spring:
   application:
     name: cnpj-analyzr-spring-app
   datasource:
-    url: jdbc:postgresql://172.17.0.3:5432/cnpjdb
-    username: cnpjuser
-    password: cnpjpass
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASS}
     driver-class-name: org.postgresql.Driver
 management:
   endpoints:
     web:
       cors:
-        allowed-origins: http://localhost:4200
+        allowed-origins: '*'
         allowed-methods: GET,POST
 
 owner-email: viniciusbaleia1999@gmail.com
 
 mailgun:
-  url: MAILGUN_URL
-  apiKey: MAILGUN_APIKEY
+  url: ${MAILGUN_URL:test}
+  apiKey: ${MAILGUN_APIKEY:test}
   # email to be the host of the email sent by the service
-  hostFrom: ItiMenu <support@itimenu.app>
+  hostFrom: ${MAILGUN_HOST_FROM:ItiMenu <support@itimenu.app>}
   
