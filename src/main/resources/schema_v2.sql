@@ -1,39 +1,59 @@
+-- the lead way of structure things will be
+-- centered by the email
+
 CREATE TABLE IF NOT EXISTS lead(
-    email VARCHAR(100) PRIMARY KEY,
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(100) UNIQUE,
+    send_quantity INT NOT NULL DEFAULT 0,
+    last_send DATE
 );
+CREATE INDEX lead_id_index ON lead (id);
+CREATE INDEX lead_email_index ON lead (email);
 
-CREATE INDEX company_email_index ON company (id);
-
-
-CREATE TABLE IF NOT EXISTS company(
-    cnpj BIGINT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS establishment(
+    basic_cnpj BIGINT NOT NULL,
+    order_cnpj INT NOT NULL,
+    cnpj_verification_digit INT NOT NULL,
     mother_branch_identifier VARCHAR,
     fantasy_name VARCHAR,
     registry_situation VARCHAR,
     registry_situation_date VARCHAR,
-    reasonRegistrySituation VARCHAR,
-    outdoorCityName VARCHAR,
+    reason_registry_situation VARCHAR,
+    outdoor_city_name VARCHAR,
     country VARCHAR,
-    startActivityDate VARCHAR,
-    cnaeTaxPrimary VARCHAR,
-    cnaeTaxSecondary VARCHAR,
-    addressStreetType VARCHAR,
-    addressStreet VARCHAR,
-    addressNumber VARCHAR,
-    addressComplement VARCHAR,
-    addressNeighborhood VARCHAR,
-    addressCode VARCHAR,
-    addressState VARCHAR,
-    addressCity VARCHAR,
-    telephoneCode1 VARCHAR,
+    start_activity_date VARCHAR,
+    cnae_tax_primary VARCHAR,
+    cnae_tax_secondary VARCHAR,
+    address_street_type VARCHAR,
+    address_street VARCHAR,
+    address_number VARCHAR,
+    address_complement VARCHAR,
+    address_neighborhood VARCHAR,
+    address_code VARCHAR,
+    address_state VARCHAR,
+    address_city VARCHAR,
+    telephone_code1 VARCHAR,
     telephone1 VARCHAR,
-    telephoneCode2 VARCHAR,
+    telephone_code2 VARCHAR,
     telephone2 VARCHAR,
-    specialSituation VARCHAR,
-    specialSituationDate VARCHAR,
-    email VARCHAR(100) NOT NULL REFERENCES lead(email)
+    special_situation VARCHAR,
+    special_situation_date VARCHAR,
+    PRIMARY KEY (basic_cnpj, order_cnpj, cnpj_verification_digit),
+    lead_id BIGINT NOT NULL REFERENCES lead(id)
 );
-CREATE INDEX company_cnpj_index ON company (cnpj);
+CREATE INDEX establishment_cnpj_index ON establishment (basic_cnpj);
+
+CREATE TABLE IF NOT EXISTS company(
+    basic_cnpj BIGINT PRIMARY KEY,
+    name TEXT,
+    legal_nature INT NOT NULL,
+    owner_qualification INT NOT NULL DEFAULT 0,
+    social_capital BIGINT NOT NULL DEFAULT 0,
+    company_size INT NOT NULL,
+    responsible_govern_entity TEXT NOT NULL DEFAULT '',
+    lead_id BIGINT NOT NULL REFERENCES lead(id)
+);
+CREATE INDEX company_cnpj_index ON company (basic_cnpj);
 
 CREATE TABLE IF NOT EXISTS template(
     id BIGSERIAL PRIMARY KEY,
@@ -47,24 +67,24 @@ CREATE TABLE IF NOT EXISTS campaign(
     template_id BIGINT NOT NULL REFERENCES template(id),
     description TEXT,
     company_count INT,
-    created_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS campaign_row(
     id BIGSERIAL PRIMARY KEY,
-    email BIGINT NOT NULL REFERENCES company(id),
+    lead_id BIGINT NOT NULL REFERENCES lead(id),
     success BOOLEAN DEFAULT FALSE,
     error_msg TEXT,
+    send_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    opened BOOLEAN NOT NULL DEFAULT FALSE,
+    clicked BOOLEAN NOT NULL DEFAULT FALSE,
+    clicked_date DATE,
     campaign_id BIGINT NOT NULL REFERENCES campaign(id)
 );
+CREATE INDEX campaign_row_index ON campaign_row(id);
 
 CREATE TABLE IF NOT EXISTS cnae(
     code SERIAL PRIMARY KEY,
     description TEXT
-);
-
-CREATE TABLE IF NOT EXISTS potential_customer(
-    email VARCHAR(100) PRIMARY KEY,
-    
 );
 

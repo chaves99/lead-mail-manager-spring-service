@@ -104,7 +104,6 @@ public class CompanyRepository {
 
         query.append(" ORDER BY c.email LIMIT " + filter.getPageSize());
 
-        System.out.println("groupByEmail - query:" + query);
         return jdbcTemplate.query(query.toString(), Map.of(), (rs, rowNum) -> {
             return EmailCompanyResponse.builder()
                     .email(rs.getString("email"))

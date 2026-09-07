@@ -29,7 +29,7 @@ public class CampaignRepository {
                     te.id as te_id, te.name as te_name
                 FROM campaign c
                 LEFT JOIN campaign_row cr
-                ON (c.id = cr.campaign_parent_id)
+                ON (c.id = cr.campaign_id)
                 LEFT JOIN template te ON (c.template_id = te.id)
                 GROUP BY c.id, te.id
                 ORDER BY c.id
@@ -63,17 +63,17 @@ public class CampaignRepository {
         return (Long) holder.getKeys().get("id");
     }
 
-    public void insertRow(Long parentId, Long companyId, boolean success, String errorMsg) {
+    public void insertRow(Long parentId, Long leadId, boolean success, String errorMsg) {
         log.debug("insertRow parentId:{} companyId:{}, success:{} errorMsg:{}",
-                parentId, companyId, success, errorMsg);
+                parentId, leadId, success, errorMsg);
         String sql = """
-                INSERT INTO campaign_row(campaign_parent_id, company_id, success, error_msg)
-                VALUES (:campaign_parent_id, :company_id, :success, :error_msg)
+                INSERT INTO campaign_row(campaign_id, lead_id, success, error_msg)
+                VALUES (:campaign_id, :lead_id, :success, :error_msg)
                 """;
 
         Map<String, Object> map = new HashMap<>();
-        map.put("campaign_parent_id", parentId);
-        map.put("company_id", companyId);
+        map.put("campaign_id", parentId);
+        map.put("lead_id", leadId);
         map.put("success", success);
         map.put("error_msg", errorMsg);
 

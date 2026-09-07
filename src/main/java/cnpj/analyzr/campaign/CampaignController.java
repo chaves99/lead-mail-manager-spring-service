@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cnpj.analyzr.payload.GetCompanyRequestFilter;
-import cnpj.analyzr.payload.GetEmailRequestFilter;
+import cnpj.analyzr.lead.LeadFilterRecord;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 
@@ -46,7 +45,6 @@ public class CampaignController {
             Integer rowCount, LocalDateTime createdAt, Integer success, Integer failure) {
     }
 
-    public static record CampaignExecute(GetEmailRequestFilter emailFilter, GetCompanyRequestFilter companyFilter,
-            String description, Long templateId, Integer limit) {
+    public static record CampaignExecute(LeadFilterRecord filter, String description, Long templateId, Integer limit) {
     }
 }

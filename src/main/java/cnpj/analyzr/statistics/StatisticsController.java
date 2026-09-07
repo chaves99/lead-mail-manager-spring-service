@@ -17,10 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 public class StatisticsController {
 
     @GetMapping
-    public ResponseEntity<?> countAndRedirect(
-            @RequestParam("campaign_id") Long campaignId,
-            @RequestParam("customer_email") String customerEmail) {
-        log.info("statistics countAndRedirect - campaignId:{} customerEmail:{}", campaignId, customerEmail);
+    public ResponseEntity<?> countAndRedirect(@RequestParam("campaign_row_id") Long campaignRowId) {
+        log.info("statistics countAndRedirect - campaignId:{}", campaignRowId);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .build();
