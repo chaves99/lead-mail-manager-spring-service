@@ -12,7 +12,4 @@ public record Campaign(
         String description,
         LocalDateTime createdAt,
         List<CampaignRow> campaigns) {
-
-    public static record CampaignRow(Long id, Long companyId, boolean success) {
-    }
 }

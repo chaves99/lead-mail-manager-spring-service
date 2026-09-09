@@ -63,21 +63,4 @@ public class CampaignRepository {
         return (Long) holder.getKeys().get("id");
     }
 
-    public void insertRow(Long parentId, Long leadId, boolean success, String errorMsg) {
-        log.debug("insertRow parentId:{} companyId:{}, success:{} errorMsg:{}",
-                parentId, leadId, success, errorMsg);
-        String sql = """
-                INSERT INTO campaign_row(campaign_id, lead_id, success, error_msg)
-                VALUES (:campaign_id, :lead_id, :success, :error_msg)
-                """;
-
-        Map<String, Object> map = new HashMap<>();
-        map.put("campaign_id", parentId);
-        map.put("lead_id", leadId);
-        map.put("success", success);
-        map.put("error_msg", errorMsg);
-
-        jdbcTemplate.update(sql, map);
-    }
-
 }

@@ -1,9 +1,11 @@
 
 package cnpj.analyzr.lead;
 
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -26,14 +28,53 @@ public class LeadRepository {
         return executeQueryList(sql, Map.of("ids", ids));
     }
 
+    public void updateOpen(Long id, int open) {
+        try {
+            jdbcTemplate.update("UPDATE lead SET open = :open WHERE id = :id",
+                    Map.of("id", id, "open", open));
+        } catch (Exception e) {
+            log.error("updateOpen - id:{} open:{} exception: ", id, open, e);
+        }
+    }
+
+    public void updateClick(Long id, int click) {
+        log.info("updateClick - id:{} open:{}", id, click);
+        try {
+            jdbcTemplate.update("UPDATE lead SET click = :click, last_click_date = CURRENT_DATE WHERE id = :id",
+                    Map.of("id", id, "click", click));
+        } catch (Exception e) {
+            log.error("updateOpen - id:{} click:{} exception: ", id, click, e);
+        }
+    }
+
+    public Optional<LeadRecord> find(Long id) {
+        try {
+            return Optional.ofNullable(
+                    jdbcTemplate.queryForObject("SELECT * FROM lead WHERE id = :id", Map.of("id", id), (rs, rn) -> {
+                        Date lastSend = rs.getDate("last_send");
+                        Date lastClick = rs.getDate("last_click_date");
+                        return LeadRecord.builder()
+                                .id(rs.getLong("id"))
+                                .email(rs.getString("email"))
+                                .lastSend(lastSend != null ? lastSend.toLocalDate() : null)
+                                .open(rs.getInt("open"))
+                                .click(rs.getInt("click"))
+                                .lastClickDate(lastClick != null ? lastClick.toLocalDate() : null)
+                                .build();
+                    }));
+        } catch (Exception e) {
+            log.info("find id:{} exception:", id, e);
+        }
+        return Optional.empty();
+    }
+
     public void update(Long id, Integer sendQuantity) {
         String sql = """
-            UPDATE lead SET send_quantity = :send_quantity, last_send = now() WHERE id = :id
-            """;
+                UPDATE lead SET send_quantity = :send_quantity, last_send = now() WHERE id = :id
+                """;
 
         jdbcTemplate.update(sql, Map.of("send_quantity", sendQuantity, "id", id));
     }
-
 
     public int count(LeadFilterRecord filter) {
         StringBuilder sql = new StringBuilder("""
@@ -68,7 +109,11 @@ public class LeadRepository {
 
     private List<LeadRecord> executeQueryList(String sql, Map<String, Object> map) {
         return jdbcTemplate.query(sql, map, (rs, rowNum) -> {
-            return new LeadRecord(rs.getLong("id"), rs.getString("email"), rs.getInt("send_quantity"));
+            return LeadRecord.builder()
+                    .id(rs.getLong("id"))
+                    .email(rs.getString("email"))
+                    .send(rs.getInt("send_quantity"))
+                    .build();
         });
     }
 

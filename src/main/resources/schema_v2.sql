@@ -5,7 +5,10 @@ CREATE TABLE IF NOT EXISTS lead(
     id SERIAL PRIMARY KEY,
     email VARCHAR(100) UNIQUE,
     send_quantity INT NOT NULL DEFAULT 0,
-    last_send DATE
+    last_send DATE,
+    open INT NOT NULL DEFAULT FALSE,
+    click INT NOT NULL DEFAULT FALSE,
+    last_click_date DATE
 );
 CREATE INDEX lead_id_index ON lead (id);
 CREATE INDEX lead_email_index ON lead (email);
