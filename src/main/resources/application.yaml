@@ -1,4 +1,9 @@
+# server.tomcat.max-http-form-post-size: -1
+# server.tomcat.max-swallow-size: -1
+
 spring:
+  codec:
+    max-in-memory-size: 1TB
   application:
     name: cnpj-analyzr-spring-app
   datasource:
@@ -20,4 +25,5 @@ mailgun:
   apiKey: ${MAILGUN_APIKEY:test}
   # email to be the host of the email sent by the service
   hostFrom: ${MAILGUN_HOST_FROM:ItiMenu <support@itimenu.app>}
-  
+
+  # Caused by: the request was rejected because its size (3141944029) exceeds the configured maximum (10485760)
