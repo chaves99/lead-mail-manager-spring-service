@@ -8,12 +8,6 @@ spring:
     username: ${DB_USER:leaduser}
     password: ${DB_PASS:leadpass}
     driver-class-name: org.postgresql.Driver
-management:
-  endpoints:
-    web:
-      cors:
-        allowed-origins: '*'
-        allowed-methods: GET,POST,PUT,OPTIONS,DELETE
 
 owner-email: viniciusbaleia1999@gmail.com
 
