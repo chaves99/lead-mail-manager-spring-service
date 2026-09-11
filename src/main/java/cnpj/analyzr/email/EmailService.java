@@ -52,11 +52,9 @@ public class EmailService {
             parts.add("subject", subject);
             parts.add("html", body);
             ResponseSpec res = restClient.post().body(parts).retrieve();
-            Map<String, Object> map = res.body(HashMap.class);
             return new EmailResult(null, true);
         } catch(HttpClientErrorException e) {
             Map<String, Object> bodyMap = e.getResponseBodyAs(HashMap.class);
-            System.out.println("====> " + bodyMap);
             log.warn("send - message: {}", e.getResponseBodyAsString());
             return new EmailResult((String)bodyMap.get("message"), false);
         }catch (Exception e) {

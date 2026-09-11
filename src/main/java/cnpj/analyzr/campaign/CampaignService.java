@@ -6,10 +6,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-import org.jsoup.nodes.TextNode;
 import org.jsoup.select.Elements;
-import org.jspecify.annotations.Nullable;
-import org.jsoup.nodes.Node;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -30,15 +27,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CampaignService {
 
-    private static final String CAMPAIGN_ROW_ID_REPLACABLE_TOKEN = "$ROW_ID$";
-    private static final String URL_TARGET_REPLACABLE_TOKEN = "$URL_TARGET$";
+    private static final String CAMPAIGN_ROW_ID_REPLACABLE_TOKEN = "ROW_ID";
+    private static final String URL_TARGET_REPLACABLE_TOKEN = "URL_TARGET";
 
-    // localhost:8080/statistics/track-click?campaign_row_id=131&url_target=https://itimenu.app/customer-menu/Q3DSSXnR0N82zC2GAn5P
-    private static final String TRACKABLE_URL = "https://lead-mail-manager-spring-service-production.up.railway.app/statistics/track-click";
     private static final String TRACKABLE_URL_PARAMS = "?campaign_row_id=" + CAMPAIGN_ROW_ID_REPLACABLE_TOKEN
             + "&url_target=" + URL_TARGET_REPLACABLE_TOKEN;
 
-    private static final String IMG_OPEN_EMAIL_TRACK = "<img src=\"http://localhost:8080/statistics?campaign_row_id="
+    private static final String TRACKABLE_URL = "https://lead-mail-manager-spring-service-production.up.railway.app/statistics/track-click"
+            + TRACKABLE_URL_PARAMS;
+
+    private static final String IMG_OPEN_EMAIL_TRACK = "<img src=\"https://lead-mail-manager-spring-service-production.up.railway.app/statistics?campaign_row_id="
             + CAMPAIGN_ROW_ID_REPLACABLE_TOKEN + "\" width=\"1\" height=\"1\" alt=\"\" />";
 
     private final EmailService emailSenderService;
@@ -70,9 +68,10 @@ public class CampaignService {
             leads.stream().forEach(lead -> {
                 long rowId = campaignRowRepository.insertRow(campaignId, lead.id());
 
-                String emailBody = prepareEmailBody(12345l, template.body());
+                String emailBody = prepareEmailBody(rowId, template.body());
 
-                EmailResult result = emailSenderService.send(lead.email(), template.subject(), emailBody);
+                EmailResult result = emailSenderService.send(lead.email(),
+                        template.subject(), emailBody);
 
                 campaignRowRepository.updateEmailResponse(rowId, result.success(),
                         result.message());
@@ -94,7 +93,7 @@ public class CampaignService {
 
     private String prepareEmailBody(Long rowId, String emailBody) {
         Document document = Jsoup.parse(emailBody);
-        Element htmlElement = document.select("html").first();
+        Element htmlElement = document.select("body").first();
         htmlElement.append(IMG_OPEN_EMAIL_TRACK.replace(CAMPAIGN_ROW_ID_REPLACABLE_TOKEN, rowId.toString()));
 
         findLinks(document, rowId);

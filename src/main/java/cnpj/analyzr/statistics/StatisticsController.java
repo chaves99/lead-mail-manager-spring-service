@@ -41,6 +41,4 @@ public class StatisticsController {
                 .build();
     }
 
-    // localhost:8080/statistics/track-click?campaign_row_id=131&url_target=https://itimenu.app/customer-menu/Q3DSSXnR0N82zC2GAn5P
-
 }
