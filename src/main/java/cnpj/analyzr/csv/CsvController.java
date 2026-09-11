@@ -1,13 +1,17 @@
 package cnpj.analyzr.csv;
 
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,11 +22,22 @@ import lombok.extern.slf4j.Slf4j;
 public class CsvController {
 
     @PostMapping
-    public ResponseEntity<?> post(HttpServletRequest request) {
-        System.out.println(request.getContentLength());
-        System.out.println(request.getContentType());
-        System.out.println(request.getContextPath());
-        // System.out.println("-> file size:" + file.getSize() + " file:" + file.getOriginalFilename());
+    public ResponseEntity<?> post(@RequestParam FileType fileType, @RequestBody byte[] request) {
+        System.out.println(request);
+        try (InputStream is = new ByteArrayInputStream(request);
+                InputStreamReader reader = new InputStreamReader(is);
+                BufferedReader bufferedReader = new BufferedReader(reader)) {
+            System.out.println(bufferedReader.readLine());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         return ResponseEntity.ok().build();
+    }
+
+    public static enum FileType {
+        ESTABLISHMENT,
+        LEAD,
+        COMPANY;
     }
 }
