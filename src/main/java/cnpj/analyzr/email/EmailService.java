@@ -4,7 +4,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -32,6 +31,7 @@ public class EmailService {
             @Value("${mailgun.url}") String mailgunUrl,
             @Value("${mailgun.apikey}") String apiKey,
             TemplateRepository templateRepository) {
+        log.info("constructor - mailgunUrl:{}", mailgunUrl);
         String basicAuth = "api:" + apiKey;
         this.restClient = restClientBuilder
                 .baseUrl(mailgunUrl)
