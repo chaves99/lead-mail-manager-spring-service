@@ -1,11 +1,7 @@
 package cnpj.analyzr.csv;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.unit.DataSize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,17 +17,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("csv")
 public class CsvController {
 
+    private final CsvService csvService;
+
     @PostMapping
     public ResponseEntity<?> post(@RequestParam FileType fileType, @RequestBody byte[] request) {
-        System.out.println(request);
-        try (InputStream is = new ByteArrayInputStream(request);
-                InputStreamReader reader = new InputStreamReader(is);
-                BufferedReader bufferedReader = new BufferedReader(reader)) {
-            System.out.println(bufferedReader.readLine());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        DataSize dataSize = DataSize.ofBytes(request.length);
+        log.info("POST - fileType:{} file size: (GB):{} (MB):{} (KB):{}",
+                fileType, dataSize.toGigabytes(), dataSize.toMegabytes(), dataSize.toKilobytes());
+        csvService.processAsync(fileType, request);
         return ResponseEntity.ok().build();
     }
 

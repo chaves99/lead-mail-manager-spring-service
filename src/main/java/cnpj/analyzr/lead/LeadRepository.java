@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -19,6 +21,14 @@ import lombok.extern.slf4j.Slf4j;
 public class LeadRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
+
+    public void insert(List<String> emails) {
+        String sql = "INSERT INTO lead(email) VALUES(?) ON CONFLICT(email) DO NOTHING";
+
+        jdbcTemplate.getJdbcTemplate().batchUpdate(sql, emails, emails.size(), (ps, arg) -> {
+            ps.setString(1, arg);
+        });
+    }
 
     public List<LeadRecord> find(List<Long> ids) {
         String sql = """
@@ -66,6 +76,22 @@ public class LeadRepository {
             log.info("find id:{} exception:", id, e);
         }
         return Optional.empty();
+    }
+
+    public Optional<Long> find(String email) {
+        try {
+            String sql = "SELECT id FROM lead WHERE email = :email";
+            Long id = jdbcTemplate.queryForObject(sql, Map.of("email", email), Long.class);
+            return Optional.ofNullable(id);
+        } catch (CannotGetJdbcConnectionException e) {
+            log.error("find by email:{} exception:", email, e);
+            throw e;
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return Optional.empty();
+        } catch (Exception e) {
+            log.error("find by email:{} exception: ", email, e.getMessage());
+            return Optional.empty();
+        }
     }
 
     public void update(Long id, Integer sendQuantity) {
