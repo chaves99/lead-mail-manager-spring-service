@@ -9,16 +9,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/lead")
 @RequiredArgsConstructor
+@Slf4j
 public class LeadController {
 
     private final LeadRepository leadRepository;
 
     @PostMapping
     public ResponseEntity<LeadResponse> fetch(@RequestBody LeadFilterRecord filter) {
+        log.info("fetch - filter:{}", filter);
         List<LeadRecord> body = leadRepository.find(filter);
         int count = leadRepository.count(filter);
         return ResponseEntity.ok(new LeadResponse(count, body));

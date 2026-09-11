@@ -46,18 +46,6 @@ CREATE TABLE IF NOT EXISTS establishment(
 );
 CREATE INDEX establishment_cnpj_index ON establishment (basic_cnpj);
 
-CREATE TABLE IF NOT EXISTS company(
-    basic_cnpj BIGINT PRIMARY KEY,
-    name TEXT,
-    legal_nature INT NOT NULL,
-    owner_qualification INT NOT NULL DEFAULT 0,
-    social_capital BIGINT NOT NULL DEFAULT 0,
-    company_size INT NOT NULL,
-    responsible_govern_entity TEXT NOT NULL DEFAULT '',
-    lead_id BIGINT NOT NULL REFERENCES lead(id)
-);
-CREATE INDEX company_cnpj_index ON company (basic_cnpj);
-
 CREATE TABLE IF NOT EXISTS template(
     id BIGSERIAL PRIMARY KEY,
     subject TEXT,
