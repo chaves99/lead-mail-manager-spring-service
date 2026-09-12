@@ -33,10 +33,10 @@ public class CampaignService {
     private static final String TRACKABLE_URL_PARAMS = "?campaign_row_id=" + CAMPAIGN_ROW_ID_REPLACABLE_TOKEN
             + "&url_target=" + URL_TARGET_REPLACABLE_TOKEN;
 
-    private static final String TRACKABLE_URL = "https://lead-mail-manager-spring-service-production.up.railway.app/statistics/track-click"
+    private static final String CLICK_TRACKABLE_URL = "https://lead-mail-manager-spring-service-production.up.railway.app/statistics/track-click"
             + TRACKABLE_URL_PARAMS;
 
-    private static final String IMG_OPEN_EMAIL_TRACK = "<img src=\"https://lead-mail-manager-spring-service-production.up.railway.app/statistics?campaign_row_id="
+    private static final String IMG_OPEN_EMAIL_TRACK = "<img src=\"https://lead-mail-manager-spring-service-production.up.railway.app/statistics/track-open?campaign_row_id="
             + CAMPAIGN_ROW_ID_REPLACABLE_TOKEN + "\" width=\"1\" height=\"1\" alt=\"\" />";
 
     private final EmailService emailSenderService;
@@ -105,7 +105,7 @@ public class CampaignService {
         select.forEach(e -> {
             Attribute attribute = e.attribute("href");
             String value = attribute.getValue();
-            String finalTrackableUrl = TRACKABLE_URL
+            String finalTrackableUrl = CLICK_TRACKABLE_URL
                     .replace(CAMPAIGN_ROW_ID_REPLACABLE_TOKEN, rowId.toString())
                     .replace(URL_TARGET_REPLACABLE_TOKEN, value);
             e.attribute("href").setValue(finalTrackableUrl);
