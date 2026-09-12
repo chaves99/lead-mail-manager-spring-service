@@ -45,19 +45,20 @@ public class EmailService {
     @SuppressWarnings("unchecked")
     public EmailResult send(String customerEmail, String subject, String body) {
         try {
-            log.info("send customerEmail:{}", customerEmail);
+            log.info("send customerEmail:{} hostFrom:{} subject:{}", customerEmail, hostFrom, subject);
             MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
             parts.add("from", hostFrom);
             parts.add("to", customerEmail);
             parts.add("subject", subject);
             parts.add("html", body);
             ResponseSpec res = restClient.post().body(parts).retrieve();
+            log.info("send - response:{} responseEntity:{}", res, res.toEntity(String.class));
             return new EmailResult(null, true);
-        } catch(HttpClientErrorException e) {
+        } catch (HttpClientErrorException e) {
             Map<String, Object> bodyMap = e.getResponseBodyAs(HashMap.class);
             log.warn("send - message: {}", e.getResponseBodyAsString());
-            return new EmailResult((String)bodyMap.get("message"), false);
-        }catch (Exception e) {
+            return new EmailResult((String) bodyMap.get("message"), false);
+        } catch (Exception e) {
             log.info("send - error: ", e);
             return new EmailResult(e.getMessage(), false);
         }
@@ -68,5 +69,6 @@ public class EmailService {
         return send(ownerEmail, subject, body);
     }
 
-    public static record EmailResult(String message, boolean success){}
+    public static record EmailResult(String message, boolean success) {
+    }
 }
