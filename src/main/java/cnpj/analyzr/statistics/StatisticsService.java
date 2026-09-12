@@ -27,12 +27,13 @@ public class StatisticsService {
                         leadRepository.updateOpen(lead.id(), lead.open() + 1);
                     });
         } catch (Exception e) {
-            log.error("opened - exception: ", e);
+            // log.error("opened - exception: ", e);
         }
     }
 
     @Async
     public void trackClick(Long campaignRowId) {
+        try {
         campaignRowRepository.updateClick(campaignRowId);
         campaignRowRepository
                 .find(campaignRowId)
@@ -40,5 +41,8 @@ public class StatisticsService {
                 .ifPresent(lead -> {
                     leadRepository.updateClick(lead.id(), lead.click() + 1);
                 });
+        } catch(Exception e) {
+            log.info("trackClick - excpetion: {}", e.getMessage());
+        }
     }
 }
