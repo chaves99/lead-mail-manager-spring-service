@@ -22,17 +22,24 @@ public class StatisticsController {
 
     @GetMapping("/track-open")
     public ResponseEntity<?> emailOpened(@RequestParam("campaign_row_id") Long campaignRowId) {
-        log.info("statistics countAndRedirect - campaignId:{}", campaignRowId);
-        service.opened(campaignRowId);
-        return ResponseEntity
+        ResponseEntity<Object> responseEntity = ResponseEntity
                 .status(HttpStatus.OK)
                 .build();
+        if (campaignRowId == null) {
+            return responseEntity;
+        }
+        log.info("statistics countAndRedirect - campaignId:{}", campaignRowId);
+        service.opened(campaignRowId);
+        return responseEntity;
     }
 
     @GetMapping("/track-click")
     public ResponseEntity<?> trackClick(
             @RequestParam(name = "campaign_row_id", required = false) Long campaignRowId,
             @RequestParam(name = "url_target", required = false) String urlTarget) {
+        if (campaignRowId == null || urlTarget == null) {
+            return ResponseEntity.ok().build();
+        }
         log.info("trackClick - urlTarget:{}", urlTarget);
         service.trackClick(campaignRowId);
         return ResponseEntity
