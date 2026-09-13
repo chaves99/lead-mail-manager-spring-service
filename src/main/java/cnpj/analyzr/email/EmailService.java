@@ -45,14 +45,12 @@ public class EmailService {
     @SuppressWarnings("unchecked")
     public EmailResult send(String customerEmail, String subject, String body) {
         try {
-            log.info("send customerEmail:{} hostFrom:{} subject:{}", customerEmail, hostFrom, subject);
             MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
             parts.add("from", hostFrom);
             parts.add("to", customerEmail);
             parts.add("subject", subject);
             parts.add("html", body);
             ResponseSpec res = restClient.post().body(parts).retrieve();
-            log.info("send - response:{} responseEntity:{}", res, res.toEntity(String.class));
             return new EmailResult(null, true);
         } catch (HttpClientErrorException e) {
             Map<String, Object> bodyMap = e.getResponseBodyAs(HashMap.class);
