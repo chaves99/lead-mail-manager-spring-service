@@ -51,6 +51,7 @@ public class EmailService {
             parts.add("subject", subject);
             parts.add("html", body);
             ResponseSpec res = restClient.post().body(parts).retrieve();
+            log.info("send email:{} response:{}", customerEmail, res.body(String.class));
             return new EmailResult(null, true);
         } catch (HttpClientErrorException e) {
             Map<String, Object> bodyMap = e.getResponseBodyAs(HashMap.class);

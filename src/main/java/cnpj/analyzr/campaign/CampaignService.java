@@ -66,8 +66,10 @@ public class CampaignService {
 
             log.info("execute - sending email for {} customers, template_id: {}", leads.size(), template.id());
 
-            // mailgun did not handle parallel stream well
-            leads.stream().forEach(lead -> {
+            int countErrors = 0;
+            int countSuccess = 0;
+
+            for (var lead : leads) {
                 long rowId = campaignRowRepository.insertRow(campaignId, lead.id());
 
                 String emailBody = prepareEmailBody(rowId, template.body());
@@ -80,14 +82,20 @@ public class CampaignService {
                 if (result.success()) {
                     int sendQuantity = lead.send() == null ? 1 : (lead.send() + 1);
                     leadRepository.update(lead.id(), sendQuantity);
+                    countSuccess++;
+                } else {
+                    log.warn("error to send email:{} meassage:{}");
+                    countErrors++;
                 }
 
                 // log.info("execute campaign - response:{} company email:{}", result,
                 //         lead.email());
-            });
+            }
 
-            long endTime = System.currentTimeMillis();
-            log.info("execute - finished in {} seconds", ((endTime - startTime) / 1000));
+            long endTime = ((System.currentTimeMillis() - startTime) / 1000);
+
+            log.info("execute - finished in {} seconds success:{} error:{}",
+                    endTime, countSuccess, countErrors);
         } catch (Exception e) {
             log.error("execute: ", e);
         }
