@@ -10,9 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RestController
 @RequestMapping("statistics")
 @RequiredArgsConstructor
@@ -28,7 +26,6 @@ public class StatisticsController {
         if (campaignRowId == null) {
             return responseEntity;
         }
-        log.info("statistics countAndRedirect - campaignId:{}", campaignRowId);
         service.opened(campaignRowId);
         return responseEntity;
     }
@@ -40,7 +37,6 @@ public class StatisticsController {
         if (campaignRowId == null || urlTarget == null) {
             return ResponseEntity.ok().build();
         }
-        log.info("trackClick - urlTarget:{}", urlTarget);
         service.trackClick(campaignRowId);
         return ResponseEntity
                 .status(HttpStatus.FOUND)

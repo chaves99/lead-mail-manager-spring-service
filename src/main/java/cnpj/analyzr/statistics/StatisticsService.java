@@ -24,6 +24,7 @@ public class StatisticsService {
                     .find(campaignRowId)
                     .flatMap(cr -> leadRepository.find(cr.leadId()))
                     .ifPresent(lead -> {
+                        log.info("email opened: {}", lead.email());
                         leadRepository.updateOpen(lead.id(), lead.open() + 1);
                     });
         } catch (Exception e) {
@@ -39,6 +40,7 @@ public class StatisticsService {
                 .find(campaignRowId)
                 .flatMap(cr -> leadRepository.find(cr.leadId()))
                 .ifPresent(lead -> {
+                    log.info("trackClick - lead: {}", lead.email());
                     leadRepository.updateClick(lead.id(), lead.click() + 1);
                 });
         } catch(Exception e) {
