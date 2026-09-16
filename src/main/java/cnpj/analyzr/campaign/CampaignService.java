@@ -84,7 +84,7 @@ public class CampaignService {
                     leadRepository.update(lead.id(), sendQuantity);
                     countSuccess++;
                 } else {
-                    log.warn("error to send email:{} meassage:{}");
+                    log.warn("error to send email:{} meassage:{}", lead.email(), result.message());
                     countErrors++;
                 }
 

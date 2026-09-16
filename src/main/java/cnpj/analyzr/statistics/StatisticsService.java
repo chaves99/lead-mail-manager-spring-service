@@ -28,7 +28,7 @@ public class StatisticsService {
                         leadRepository.updateOpen(lead.id(), lead.open() + 1);
                     });
         } catch (Exception e) {
-            // log.error("opened - exception: ", e);
+            log.error("opened - exception: ", e);
         }
     }
 
@@ -40,7 +40,7 @@ public class StatisticsService {
                 .find(campaignRowId)
                 .flatMap(cr -> leadRepository.find(cr.leadId()))
                 .ifPresent(lead -> {
-                    log.info("trackClick - lead: {}", lead.email());
+                    log.info("email clicked: {}", lead.email());
                     leadRepository.updateClick(lead.id(), lead.click() + 1);
                 });
         } catch(Exception e) {

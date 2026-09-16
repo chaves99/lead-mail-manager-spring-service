@@ -48,7 +48,6 @@ public class LeadRepository {
     }
 
     public void updateClick(Long id, int click) {
-        log.info("updateClick - id:{} open:{}", id, click);
         try {
             jdbcTemplate.update("UPDATE lead SET click = :click, last_click_date = CURRENT_DATE WHERE id = :id",
                     Map.of("id", id, "click", click));
