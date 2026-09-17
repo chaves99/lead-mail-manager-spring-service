@@ -93,9 +93,17 @@ public class LeadRepository {
         }
     }
 
-    public void update(Long id, Integer sendQuantity) {
+    public void updatePlusCounter(Long id, Integer sendQuantity) {
         String sql = """
                 UPDATE lead SET send_quantity = :send_quantity, last_send = now() WHERE id = :id
+                """;
+
+        jdbcTemplate.update(sql, Map.of("send_quantity", sendQuantity, "id", id));
+    }
+
+    public void updateCounter(Long id, Integer sendQuantity) {
+        String sql = """
+                UPDATE lead SET send_quantity = :send_quantity WHERE id = :id
                 """;
 
         jdbcTemplate.update(sql, Map.of("send_quantity", sendQuantity, "id", id));

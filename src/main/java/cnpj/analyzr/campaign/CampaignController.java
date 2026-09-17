@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +25,7 @@ public class CampaignController {
     private final CampaignService campaignService;
 
     @GetMapping
-    public ResponseEntity<List<CampaignResponse>> get() {
+    public ResponseEntity<List<CampaignRecord>> get() {
         return ResponseEntity.ok(repository.find());
     }
 
@@ -39,8 +40,13 @@ public class CampaignController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{id}/undo")
+    public ResponseEntity<?> undo(@RequestBody Long id) {
+        return ResponseEntity.ok().build();
+    }
+
     @Builder
-    public static record CampaignResponse(Long id, String description,
+    public static record CampaignRecord(Long id, String description,
             Long templateId, String templateName, String fantayName,
             Integer rowCount, LocalDateTime createdAt, Integer success, Integer failure) {
     }

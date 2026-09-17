@@ -10,6 +10,7 @@ import org.jsoup.select.Elements;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import cnpj.analyzr.campaign.CampaignController.CampaignExecute;
@@ -78,7 +79,7 @@ public class CampaignService {
                 campaignRowRepository.updateEmailResponse(rowId, result);
                 if (result.success()) {
                     int sendQuantity = lead.send() == null ? 1 : (lead.send() + 1);
-                    leadRepository.update(lead.id(), sendQuantity);
+                    leadRepository.updatePlusCounter(lead.id(), sendQuantity);
                     countSuccess++;
                 } else {
                     log.warn("error to send email:{} meassage:{}", lead.email(), result.message());
@@ -96,6 +97,27 @@ public class CampaignService {
         } catch (Exception e) {
             log.error("execute: ", e);
         }
+    }
+
+    @Transactional
+    public void undo(Long id) {
+        log.info("undo - id:{}", id);
+        campaignRepository.find(id).ifPresent(campaign -> {
+            List<CampaignRow> campaignRows = campaignRowRepository.findAll(id);
+            List<LeadRecord> leads = leadRepository.find(campaignRows.stream().map(CampaignRow::leadId).toList());
+
+            leads.forEach(lead -> {
+                Integer send = lead.send();
+                if (send > 0) {
+                    leadRepository.updateCounter(lead.id(), send - 1);
+                }
+            });
+
+            log.info("undo - campaignRows:{} leads:{}", campaignRows.size(), leads.size());
+
+            campaignRowRepository.deleteAll(id);
+            campaignRepository.update(id, campaign.description() + " - [UNDO]");
+        });
     }
 
     private String prepareEmailBody(Long rowId, String emailBody) {

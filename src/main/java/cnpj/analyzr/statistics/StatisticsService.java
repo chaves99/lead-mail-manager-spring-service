@@ -21,7 +21,7 @@ public class StatisticsService {
         try {
             campaignRowRepository.updateOpen(campaignRowId);
             campaignRowRepository
-                    .find(campaignRowId)
+                    .findById(campaignRowId)
                     .flatMap(cr -> leadRepository.find(cr.leadId()))
                     .ifPresent(lead -> {
                         log.info("email opened: {}", lead.email());
@@ -37,7 +37,7 @@ public class StatisticsService {
         try {
         campaignRowRepository.updateClick(campaignRowId);
         campaignRowRepository
-                .find(campaignRowId)
+                .findById(campaignRowId)
                 .flatMap(cr -> leadRepository.find(cr.leadId()))
                 .ifPresent(lead -> {
                     log.info("email clicked: {}", lead.email());

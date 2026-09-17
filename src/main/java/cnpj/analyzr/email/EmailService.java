@@ -57,7 +57,7 @@ public class EmailService {
         } catch (HttpClientErrorException e) {
             Map<String, Object> bodyMap = e.getResponseBodyAs(HashMap.class);
             log.warn("send - message: {}", e.getResponseBodyAsString());
-            return new EmailResult((String) bodyMap.get("message"), false, null);
+            return new EmailResult(bodyMap.get("message"), false, bodyMap.get("message"));
         } catch (Exception e) {
             log.info("send - error: ", e);
             return new EmailResult(e.getMessage(), false, null);

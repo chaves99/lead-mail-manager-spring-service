@@ -1,7 +1,10 @@
 package cnpj.analyzr.campaign;
 
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -23,27 +26,38 @@ public class CampaignRowRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public Optional<CampaignRow> find(Long id) {
+    public Optional<CampaignRow> findById(Long id) {
         try {
             String sql = "SELECT * FROM campaign_row WHERE id = :id";
             return Optional.ofNullable(jdbcTemplate.queryForObject(sql, Map.of("id", id), (rs, nr) -> {
-                Date sendDate = rs.getDate("send_date");
-                Date clickedDate = rs.getDate("clicked_date");
-                return CampaignRow.builder()
-                        .id(rs.getLong("id"))
-                        .leadId(rs.getLong("lead_id"))
-                        .success(rs.getBoolean("success"))
-                        .errorMsg(rs.getString("error_msg"))
-                        .sendDate(sendDate != null ? sendDate.toLocalDate() : null)
-                        .opened(rs.getBoolean("opened"))
-                        .clicked(rs.getBoolean("clicked"))
-                        .clickedDate(clickedDate != null ? clickedDate.toLocalDate() : null)
-                        .build();
+                return buildEntity(rs);
             }));
         } catch (Exception e) {
             log.error("find id:{} exception: ", id, e);
             return Optional.empty();
         }
+    }
+
+    private CampaignRow buildEntity(ResultSet rs) throws SQLException {
+        Date sendDate = rs.getDate("send_date");
+        Date clickedDate = rs.getDate("clicked_date");
+        return CampaignRow.builder()
+                .id(rs.getLong("id"))
+                .leadId(rs.getLong("lead_id"))
+                .success(rs.getBoolean("success"))
+                .errorMsg(rs.getString("error_msg"))
+                .sendDate(sendDate != null ? sendDate.toLocalDate() : null)
+                .opened(rs.getBoolean("opened"))
+                .clicked(rs.getBoolean("clicked"))
+                .clickedDate(clickedDate != null ? clickedDate.toLocalDate() : null)
+                .build();
+    }
+
+    public List<CampaignRow> findAll(Long campaignId) {
+        String sql = "SELECT * FROM campaign_row WHERE campaign_id = :campaign_id";
+        return jdbcTemplate.query(sql, Map.of("campaign_id", campaignId), (rs, rn) -> {
+            return buildEntity(rs);
+        });
     }
 
     public void updateClick(Long id) {
@@ -91,6 +105,11 @@ public class CampaignRowRepository {
         } catch (Exception e) {
             log.error("updateOpen - id:{} exception: ", id, e);
         }
+    }
+
+    public void deleteAll(Long id) {
+        String sql = "DELETE FROM campaign_row WHERE campaign_id = :id";
+        jdbcTemplate.update(sql, Map.of("id", id));
     }
 
 }
