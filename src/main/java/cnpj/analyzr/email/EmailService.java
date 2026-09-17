@@ -51,15 +51,16 @@ public class EmailService {
             parts.add("subject", subject);
             parts.add("html", body);
             ResponseSpec res = restClient.post().body(parts).retrieve();
-            // log.info("send email:{} response:{}", customerEmail, res.body(String.class));
-            return new EmailResult(null, true);
+            Map<String, Object> responseBody = res.body(Map.class);
+            log.info("send email:{} response:{}", customerEmail, res.body(String.class));
+            return new EmailResult(responseBody.get("message"), true, responseBody.get("id"));
         } catch (HttpClientErrorException e) {
             Map<String, Object> bodyMap = e.getResponseBodyAs(HashMap.class);
             log.warn("send - message: {}", e.getResponseBodyAsString());
-            return new EmailResult((String) bodyMap.get("message"), false);
+            return new EmailResult((String) bodyMap.get("message"), false, null);
         } catch (Exception e) {
             log.info("send - error: ", e);
-            return new EmailResult(e.getMessage(), false);
+            return new EmailResult(e.getMessage(), false, null);
         }
     }
 
@@ -68,6 +69,11 @@ public class EmailService {
         return send(ownerEmail, subject, body);
     }
 
-    public static record EmailResult(String message, boolean success) {
+    public static record EmailResult(String message, boolean success, String externalId) {
+
+        public EmailResult(Object message, boolean success, Object externalId) {
+            this(message != null ? message.toString() : null, success,
+                    externalId != null ? externalId.toString() : null);
+        }
     }
 }

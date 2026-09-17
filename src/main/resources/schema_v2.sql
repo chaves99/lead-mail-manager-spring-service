@@ -70,6 +70,7 @@ CREATE TABLE IF NOT EXISTS campaign_row(
     opened BOOLEAN NOT NULL DEFAULT FALSE,
     clicked BOOLEAN NOT NULL DEFAULT FALSE,
     clicked_date DATE,
+    external_id VARCHAR,
     campaign_id BIGINT NOT NULL REFERENCES campaign(id)
 );
 CREATE INDEX campaign_row_index ON campaign_row(id);

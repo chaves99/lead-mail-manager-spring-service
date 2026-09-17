@@ -14,5 +14,6 @@ public record CampaignRow(
         boolean opened,
         boolean clicked,
         LocalDate clickedDate,
-        Long campaignId) {
+        Long campaignId, 
+        String externalId) {
 }

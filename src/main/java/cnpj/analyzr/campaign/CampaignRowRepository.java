@@ -12,6 +12,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import cnpj.analyzr.email.EmailService.EmailResult;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -78,13 +79,14 @@ public class CampaignRowRepository {
         return (Long) keyHolder.getKeys().get("id");
     }
 
-    public void updateEmailResponse(Long id, boolean success, String errorMsg) {
+    public void updateEmailResponse(Long id, EmailResult result) {
         try {
-            String sql = "UPDATE campaign_row SET success = :success, error_msg = :errorMsg WHERE id = :id";
+            String sql = "UPDATE campaign_row SET success = :success, error_msg = :errorMsg, external_id = :externalId WHERE id = :id";
             Map<String, Object> map = new HashMap<>();
             map.put("id", id);
-            map.put("success", success);
-            map.put("errorMsg", errorMsg);
+            map.put("success", result.success());
+            map.put("errorMsg", result.message());
+            map.put("externalId", result.externalId());
             jdbcTemplate.update(sql, map);
         } catch (Exception e) {
             log.error("updateOpen - id:{} exception: ", id, e);

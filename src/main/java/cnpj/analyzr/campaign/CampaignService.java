@@ -17,7 +17,6 @@ import cnpj.analyzr.email.EmailService;
 import cnpj.analyzr.email.EmailService.EmailResult;
 import cnpj.analyzr.lead.LeadRecord;
 import cnpj.analyzr.lead.LeadRepository;
-import cnpj.analyzr.statistics.StatisticsService;
 import cnpj.analyzr.template.Template;
 import cnpj.analyzr.template.TemplateRepository;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +45,6 @@ public class CampaignService {
     private final TemplateRepository templateRepository;
     private final CampaignRepository campaignRepository;
     private final CampaignRowRepository campaignRowRepository;
-    private final StatisticsService statisticsService;
 
     @Async("threadPoolTaskExecutor")
     public void execute(CampaignExecute body) {
@@ -77,8 +75,7 @@ public class CampaignService {
                 EmailResult result = emailSenderService.send(lead.email(),
                         template.subject(), emailBody);
 
-                campaignRowRepository.updateEmailResponse(rowId, result.success(),
-                        result.message());
+                campaignRowRepository.updateEmailResponse(rowId, result);
                 if (result.success()) {
                     int sendQuantity = lead.send() == null ? 1 : (lead.send() + 1);
                     leadRepository.update(lead.id(), sendQuantity);
