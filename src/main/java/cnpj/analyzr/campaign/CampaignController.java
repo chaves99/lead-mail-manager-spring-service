@@ -41,7 +41,8 @@ public class CampaignController {
     }
 
     @PutMapping("/{id}/undo")
-    public ResponseEntity<?> undo(@RequestBody Long id) {
+    public ResponseEntity<?> undo(@PathVariable Long id) {
+        this.campaignService.undo(id);
         return ResponseEntity.ok().build();
     }
 
