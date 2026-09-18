@@ -2,6 +2,7 @@ package cnpj.analyzr.csv.processor;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.springframework.stereotype.Component;
@@ -16,12 +17,17 @@ public class LeadProcessor implements CsvProcessor<cnpj.analyzr.csv.processor.Le
 
     private final LeadRepository leadRepository;
 
+    private static final Pattern patternRegex = Pattern.compile("^[a-zA-Z0-9._%+-]+@(hotmail|outlook|live|gmail|yahoo|msn)\\.com$");
+
     public Optional<Lead> parse(String[] fields) {
         try {
             String cnae = fields[11].replace("\"", "");
             String email = fields[27].replace("\"", "");
             if (Stream.of(CNAES_FILTER).noneMatch(v -> v.equals(cnae))
                     || email == null || email.isBlank()) {
+                return Optional.empty();
+            }
+            if (!patternRegex.matcher(email).find()) {
                 return Optional.empty();
             }
             return Optional.of(Lead.builder()
