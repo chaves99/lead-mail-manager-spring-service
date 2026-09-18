@@ -1,25 +1,27 @@
 package cnpj.analyzr.campaign;
 
 import java.util.List;
+import java.util.Optional;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Attribute;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import cnpj.analyzr.campaign.CampaignController.CampaignExecute;
+import cnpj.analyzr.campaign.entity.req.CampaignExecuteRecordRequest;
+import cnpj.analyzr.campaign.entity.res.CampaignDetailsRecordResponse;
+import cnpj.analyzr.campaign.row.CampaignRow;
+import cnpj.analyzr.campaign.row.CampaignRowRepository;
+import cnpj.analyzr.campaign.row.CampaignRowRepository.CampaignRowTotalsRecord;
 import cnpj.analyzr.email.EmailService;
 import cnpj.analyzr.email.EmailService.EmailResult;
 import cnpj.analyzr.lead.LeadRecord;
 import cnpj.analyzr.lead.LeadRepository;
 import cnpj.analyzr.template.Template;
 import cnpj.analyzr.template.TemplateRepository;
+import cnpj.analyzr.utils.EmailUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,18 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class CampaignService {
-
-    private static final String CAMPAIGN_ROW_ID_REPLACABLE_TOKEN = "ROW_ID";
-    private static final String URL_TARGET_REPLACABLE_TOKEN = "URL_TARGET";
-
-    private static final String TRACKABLE_URL_PARAMS = "?campaign_row_id=" + CAMPAIGN_ROW_ID_REPLACABLE_TOKEN
-            + "&url_target=" + URL_TARGET_REPLACABLE_TOKEN;
-
-    private static final String CLICK_TRACKABLE_URL = "https://lead-mail-manager-spring-service-production.up.railway.app/statistics/track-click"
-            + TRACKABLE_URL_PARAMS;
-
-    private static final String IMG_OPEN_EMAIL_TRACK = "<img src=\"https://lead-mail-manager-spring-service-production.up.railway.app/statistics/track-open?campaign_row_id="
-            + CAMPAIGN_ROW_ID_REPLACABLE_TOKEN + "\" width=\"1\" height=\"1\" alt=\"\" />";
 
     private final EmailService emailSenderService;
 
@@ -48,7 +38,7 @@ public class CampaignService {
     private final CampaignRowRepository campaignRowRepository;
 
     @Async("threadPoolTaskExecutor")
-    public void execute(CampaignExecute body) {
+    public void execute(CampaignExecuteRecordRequest body) {
         log.info("execute - body:{}", body);
         if (body.filter() == null || body.limit() == null) {
             throw new ResponseStatusException(HttpStatusCode.valueOf(400));
@@ -71,7 +61,7 @@ public class CampaignService {
             for (var lead : leads) {
                 long rowId = campaignRowRepository.insertRow(campaignId, lead.id());
 
-                String emailBody = prepareEmailBody(rowId, template.body());
+                String emailBody = EmailUtils.prepareEmailBody(rowId, template.body());
 
                 EmailResult result = emailSenderService.send(lead.email(),
                         template.subject(), emailBody);
@@ -85,9 +75,6 @@ public class CampaignService {
                     log.warn("error to send email:{} meassage:{}", lead.email(), result.message());
                     countErrors++;
                 }
-
-                // log.info("execute campaign - response:{} company email:{}", result,
-                //         lead.email());
             }
 
             long endTime = ((System.currentTimeMillis() - startTime) / 1000);
@@ -120,24 +107,20 @@ public class CampaignService {
         });
     }
 
-    private String prepareEmailBody(Long rowId, String emailBody) {
-        Document document = Jsoup.parse(emailBody);
-        Element htmlElement = document.select("body").first();
-        htmlElement.append(IMG_OPEN_EMAIL_TRACK.replace(CAMPAIGN_ROW_ID_REPLACABLE_TOKEN, rowId.toString()));
+    public CampaignDetailsRecordResponse getDetails(Long campaignId) {
+        return campaignRepository
+                .find(campaignId)
+                .map(campaign -> {
+                    CampaignRowTotalsRecord totalsByCampaignid = campaignRowRepository
+                            .findTotalsByCampaignid(campaignId);
+                    String templateName = null;
+                    Optional<Template> template = templateRepository.find(campaign.templateId());
+                    if (template.isPresent())
+                        templateName = template.get().name();
 
-        findLinks(document, rowId);
-        return document.toString();
+                    campaign.templateId();
+                    return new CampaignDetailsRecordResponse(campaign, templateName, totalsByCampaignid);
+                }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    private void findLinks(Document document, Long rowId) {
-        Elements select = document.select("a[href]");
-        select.forEach(e -> {
-            Attribute attribute = e.attribute("href");
-            String value = attribute.getValue();
-            String finalTrackableUrl = CLICK_TRACKABLE_URL
-                    .replace(CAMPAIGN_ROW_ID_REPLACABLE_TOKEN, rowId.toString())
-                    .replace(URL_TARGET_REPLACABLE_TOKEN, value);
-            e.attribute("href").setValue(finalTrackableUrl);
-        });
-    }
 }

@@ -12,6 +12,7 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import cnpj.analyzr.lead.LeadController.LeadTotalDashboard;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +29,10 @@ public class LeadRepository {
         jdbcTemplate.getJdbcTemplate().batchUpdate(sql, emails, emails.size(), (ps, arg) -> {
             ps.setString(1, arg);
         });
+    }
+
+    public void unsubscribe(Long id) {
+        jdbcTemplate.update("UPDATE lead SET unsubscribe = true WHERE id = :id", Map.of("id", id));
     }
 
     public List<LeadRecord> find(List<Long> ids) {
@@ -109,6 +114,27 @@ public class LeadRepository {
         jdbcTemplate.update(sql, Map.of("send_quantity", sendQuantity, "id", id));
     }
 
+    public int countNoFilter() {
+        String sql = "SELECT COUNT(*) FROM lead";
+        return jdbcTemplate.queryForObject(sql.toString(), Map.of(), Integer.class);
+    }
+
+    public LeadTotalDashboard findTotalDashboard() {
+        String sql = """
+                SELECT
+                    COUNT(id) AS total,
+                    SUM(open) AS open,
+                    SUM(click) AS click,
+                    COUNT(*) FILTER (WHERE unsubscribed IS TRUE) as unsubscribed
+                FROM lead
+                WHERE send_quantity > 0;
+                """;
+        return jdbcTemplate.queryForObject(sql, Map.of(), (rs, rn) -> {
+            return new LeadTotalDashboard(null, rs.getInt("total"), rs.getInt("open"), rs.getInt("click"),
+                    rs.getInt("unsubscribed"));
+        });
+    }
+
     public int count(LeadFilterRecord filter) {
         StringBuilder sql = new StringBuilder("""
                 SELECT COUNT(DISTINCT l.id) from lead l
@@ -128,6 +154,8 @@ public class LeadRepository {
                 WHERE 1=1
                 """);
 
+        // it can add a WHERE clause before or 
+        // after the `buildQuery` method
         Map<String, Object> map = buildQuery(filter, sql);
 
         sql.append(" GROUP BY l.id ORDER BY l.id ");
@@ -175,6 +203,10 @@ public class LeadRepository {
                 first = false;
             }
             query.append(") ");
+        }
+
+        if (filter.shouldFetchUnsubscribed() == null || !filter.shouldFetchUnsubscribed()) {
+            query.append(" AND l.unsubscribed IS FALSE");
         }
 
         if (filter.sentQuantity() != null && filter.sentQuantity() >= 0) {

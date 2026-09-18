@@ -1,6 +1,5 @@
 package cnpj.analyzr.campaign;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,8 +10,8 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import cnpj.analyzr.campaign.CampaignController.CampaignRecord;
-import lombok.Builder;
+import cnpj.analyzr.campaign.entity.Campaign;
+import cnpj.analyzr.campaign.entity.res.CampaignRecordResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,11 +22,11 @@ public class CampaignRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public List<CampaignRecord> find() {
+    public List<CampaignRecordResponse> find() {
         String sql = """
                 SELECT c.*,
-                    count(*) FILTER (WHERE cr.success IS TRUE) as success,
-                    count(*) FILTER (WHERE cr.success IS NOT TRUE AND cr.success IS NOT NULL) as failure,
+                    COUNT(*) FILTER (WHERE cr.success IS TRUE) as success,
+                    COUNT(*) FILTER (WHERE cr.success IS NOT TRUE AND cr.success IS NOT NULL) as failure,
                     te.id as te_id, te.name as te_name
                 FROM campaign c
                 LEFT JOIN campaign_row cr
@@ -37,7 +36,7 @@ public class CampaignRepository {
                 ORDER BY c.id
                 """;
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
-            return CampaignRecord.builder()
+            return CampaignRecordResponse.builder()
                     .id(rs.getLong("id"))
                     .description(rs.getString("description"))
                     .templateId(rs.getLong("te_id"))
@@ -87,11 +86,6 @@ public class CampaignRepository {
     public void update(Long id, String description) {
         String sql = "UPDATE campaign SET description = :description WHERE id = :id";
         jdbcTemplate.update(sql, Map.of("id", id, "description", description));
-    }
-
-    @Builder
-    public static record Campaign(Long id, String description,
-            Long templateId, Integer rowCount, LocalDateTime createdAt) {
     }
 
 }

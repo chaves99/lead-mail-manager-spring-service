@@ -1,6 +1,5 @@
 package cnpj.analyzr.campaign;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
@@ -12,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cnpj.analyzr.lead.LeadFilterRecord;
-import lombok.Builder;
+import cnpj.analyzr.campaign.entity.req.CampaignExecuteRecordRequest;
+import cnpj.analyzr.campaign.entity.res.CampaignDetailsRecordResponse;
+import cnpj.analyzr.campaign.entity.res.CampaignRecordResponse;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -25,17 +25,17 @@ public class CampaignController {
     private final CampaignService campaignService;
 
     @GetMapping
-    public ResponseEntity<List<CampaignRecord>> get() {
+    public ResponseEntity<List<CampaignRecordResponse>> get() {
         return ResponseEntity.ok(repository.find());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getDetail(@PathVariable Long id) {
-        return null;
+    public ResponseEntity<CampaignDetailsRecordResponse> getDetail(@PathVariable Long id) {
+        return ResponseEntity.ok(campaignService.getDetails(id));
     }
 
     @PostMapping
-    public ResponseEntity<?> post(@RequestBody CampaignExecute body) {
+    public ResponseEntity<?> post(@RequestBody CampaignExecuteRecordRequest body) {
         this.campaignService.execute(body);
         return ResponseEntity.ok().build();
     }
@@ -46,12 +46,4 @@ public class CampaignController {
         return ResponseEntity.ok().build();
     }
 
-    @Builder
-    public static record CampaignRecord(Long id, String description,
-            Long templateId, String templateName, String fantayName,
-            Integer rowCount, LocalDateTime createdAt, Integer success, Integer failure) {
-    }
-
-    public static record CampaignExecute(LeadFilterRecord filter, String description, Long templateId, Integer limit) {
-    }
 }

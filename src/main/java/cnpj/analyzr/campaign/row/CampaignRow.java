@@ -1,4 +1,4 @@
-package cnpj.analyzr.campaign;
+package cnpj.analyzr.campaign.row;
 
 import java.time.LocalDate;
 

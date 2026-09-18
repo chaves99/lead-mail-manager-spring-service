@@ -13,7 +13,8 @@ public record LeadFilterRecord(
         List<String> fantasyNameInclude,
         List<CnaeRequestFilter> cnae,
         Integer motherBranchId,
-        Long lastIndex) {
+        Long lastIndex,
+        Boolean shouldFetchUnsubscribed) {
 
     public boolean validMotherBranchId() {
         return motherBranchId() != null
@@ -24,6 +25,6 @@ public record LeadFilterRecord(
         return new LeadFilterRecord(pageSize, sentQuantity,
                 emailExclude, emailInclude,
                 fantasyNameExclude, fantasyNameInclude,
-                cnae, motherBranchId, lastIndex);
+                cnae, motherBranchId, lastIndex, shouldFetchUnsubscribed);
     }
 }

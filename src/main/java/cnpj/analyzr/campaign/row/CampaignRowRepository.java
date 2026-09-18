@@ -1,4 +1,4 @@
-package cnpj.analyzr.campaign;
+package cnpj.analyzr.campaign.row;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -16,6 +16,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
 import cnpj.analyzr.email.EmailService.EmailResult;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -107,9 +108,35 @@ public class CampaignRowRepository {
         }
     }
 
+    public CampaignRowTotalsRecord findTotalsByCampaignid(Long campaignId) {
+        String sql = """
+                SELECT
+                    COUNT(*) FILTER (WHERE success IS TRUE) as success,
+                    COUNT(*) FILTER (WHERE success IS FALSE) as error,
+                    COUNT(*) FILTER (WHERE opened IS TRUE) as opened,
+                    COUNT(*) FILTER (WHERE clicked IS TRUE) as clicked
+                FROM campaign_row
+                WHERE campaign_id = :campaign_id
+                GROUP BY campaign_id
+                """;
+
+        return jdbcTemplate.queryForObject(sql, Map.of("campaign_id", campaignId), (rs, rn) -> {
+            return CampaignRowTotalsRecord.builder()
+                    .success(rs.getInt("success"))
+                    .error(rs.getInt("error"))
+                    .opened(rs.getInt("opened"))
+                    .clicked(rs.getInt("clicked"))
+                    .build();
+        });
+
+    }
+
     public void deleteAll(Long id) {
         String sql = "DELETE FROM campaign_row WHERE campaign_id = :id";
         jdbcTemplate.update(sql, Map.of("id", id));
     }
 
+    @Builder
+    public static record CampaignRowTotalsRecord(int success, int error, int opened, int clicked) {
+    }
 }

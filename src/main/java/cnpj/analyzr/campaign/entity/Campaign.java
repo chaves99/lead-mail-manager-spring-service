@@ -1,7 +1,6 @@
-package cnpj.analyzr.campaign;
+package cnpj.analyzr.campaign.entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import lombok.Builder;
 
@@ -11,5 +10,5 @@ public record Campaign(
         Long templateId,
         String description,
         LocalDateTime createdAt,
-        List<CampaignRow> campaigns) {
+        Integer rowCount) {
 }
