@@ -22,4 +22,4 @@ ENV MAILGUN_URL=$MAILGUN_URL
 RUN ./mvnw package -DskipTests && \
      mv target/$(./mvnw help:evaluate -Dexpression=project.artifactId -q -DforceStdout)-$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout).jar target/app.jar
 
-ENTRYPOINT ["java", "-jar", "-Xms8g", "-Xmx8g", "-XX:MaxDirectMemorySize=8G",  "target/app.jar"]
+ENTRYPOINT ["java", "-jar", "-Xms2g", "-Xmx8g", "-XX:MaxDirectMemorySize=8G",  "target/app.jar"]
