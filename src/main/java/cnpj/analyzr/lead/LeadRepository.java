@@ -2,6 +2,8 @@
 package cnpj.analyzr.lead;
 
 import java.sql.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,8 +33,9 @@ public class LeadRepository {
         });
     }
 
-    public void unsubscribe(Long id) {
-        jdbcTemplate.update("UPDATE lead SET unsubscribe = true WHERE id = :id", Map.of("id", id));
+    public void unsubscribe(Long id, String email) {
+        String sql = "UPDATE lead SET unsubscribe = true WHERE id = :id AND email = :email";
+        jdbcTemplate.update(sql, Map.of("id", id, "email", email));
     }
 
     public List<LeadRecord> find(List<Long> ids) {
@@ -154,7 +157,7 @@ public class LeadRepository {
                 WHERE 1=1
                 """);
 
-        // it can add a WHERE clause before or 
+        // it can add a WHERE clause before or
         // after the `buildQuery` method
         Map<String, Object> map = buildQuery(filter, sql);
 
@@ -170,12 +173,16 @@ public class LeadRepository {
 
     private List<LeadRecord> executeQueryList(String sql, Map<String, Object> map) {
         return jdbcTemplate.query(sql, map, (rs, rowNum) -> {
-            return LeadRecord.builder()
-                    .id(rs.getLong("id"))
-                    .email(rs.getString("email"))
-                    .send(rs.getInt("send_quantity"))
-                    .build();
+            return buildFromResultSet(rs);
         });
+    }
+
+    private LeadRecord buildFromResultSet(ResultSet rs) throws SQLException {
+        return LeadRecord.builder()
+                .id(rs.getLong("id"))
+                .email(rs.getString("email"))
+                .send(rs.getInt("send_quantity"))
+                .build();
     }
 
     private Map<String, Object> buildQuery(LeadFilterRecord filter, StringBuilder query) {

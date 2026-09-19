@@ -13,13 +13,13 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class LeadProcessor implements CsvProcessor<cnpj.analyzr.csv.processor.LeadProcessor.Lead> {
+public class LeadProcessor implements CsvProcessor<cnpj.analyzr.csv.processor.LeadProcessor.InternalLeadProcessorRecord> {
 
     private final LeadRepository leadRepository;
 
     private static final Pattern patternRegex = Pattern.compile("^[a-zA-Z0-9._%+-]+@(hotmail|outlook|live|gmail|yahoo|msn)\\.com$");
 
-    public Optional<Lead> parse(String[] fields) {
+    public Optional<InternalLeadProcessorRecord> parse(String[] fields) {
         try {
             String cnae = fields[11].replace("\"", "");
             String email = fields[27].replace("\"", "");
@@ -30,7 +30,7 @@ public class LeadProcessor implements CsvProcessor<cnpj.analyzr.csv.processor.Le
             if (!patternRegex.matcher(email).find()) {
                 return Optional.empty();
             }
-            return Optional.of(Lead.builder()
+            return Optional.of(InternalLeadProcessorRecord.builder()
                     .email(email.toLowerCase())
                     .cnae(cnae)
                     .build());
@@ -40,11 +40,11 @@ public class LeadProcessor implements CsvProcessor<cnpj.analyzr.csv.processor.Le
     }
 
     @Builder
-    public static record Lead(String email, String cnae) {
+    public static record InternalLeadProcessorRecord(String email, String cnae) {
     }
 
     @Override
-    public void insertAll(List<Lead> list) {
+    public void insertAll(List<InternalLeadProcessorRecord> list) {
         if (!list.isEmpty())
             leadRepository.insert(list.stream().map(l -> l.email()).toList());
     }

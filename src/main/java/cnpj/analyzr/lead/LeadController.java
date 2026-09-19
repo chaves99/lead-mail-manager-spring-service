@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -30,9 +30,11 @@ public class LeadController {
         return ResponseEntity.ok(service.getTotalDashboard());
     }
 
-    @PutMapping("/{campaignRowId}/unsubscribe")
-    public ResponseEntity<?> unsubscribe(@PathVariable Long campaignRowId) {
-        service.unsubscribe(campaignRowId);
+    @PutMapping("/unsubscribe")
+    public ResponseEntity<?> unsubscribe(
+            @RequestParam("id") Long id,
+            @RequestParam("email") String email) {
+        service.unsubscribe(id, email);
         return ResponseEntity.ok().build();
     }
 
