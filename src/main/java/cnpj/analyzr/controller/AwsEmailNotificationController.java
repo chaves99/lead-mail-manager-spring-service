@@ -2,6 +2,7 @@ package cnpj.analyzr.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,7 +22,7 @@ public class AwsEmailNotificationController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping
+    @PutMapping
     public ResponseEntity<?> put(@RequestBody String body) {
         log.info("put - body:{}", body);
         return ResponseEntity.ok().build();
