@@ -2,7 +2,6 @@ package cnpj.analyzr.payload.aws;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 public record AwsSnsMessageRequest(String notificationType, AwsSnsMessageMailRequest mail) {
 
@@ -15,7 +14,7 @@ public record AwsSnsMessageRequest(String notificationType, AwsSnsMessageMailReq
             String sendingAccountId,
             String messageid,
             Boolean headersTruncated,
-            Map<String, String> headers,
+            Object headers,
             AwsSnsMessageCommonHeadersRequest commonHeaders,
             AwsSnsMessageDeliveryRequest delivery) {
     }

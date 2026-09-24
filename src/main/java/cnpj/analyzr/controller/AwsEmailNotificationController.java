@@ -46,6 +46,7 @@ public class AwsEmailNotificationController {
         try {
             AwsSnsRequest value = objectMapper.readValue(body, AwsSnsRequest.class);
             AwsSnsVerifierUtils.verify(headerMessageType, value);
+            log.info("delivered - parsing json message:{}", value.message());
             AwsSnsMessageRequest message = objectMapper.readValue(value.message(), AwsSnsMessageRequest.class);
             log.info("delivered - parsed: {}", message);
         } catch (Exception e) {
