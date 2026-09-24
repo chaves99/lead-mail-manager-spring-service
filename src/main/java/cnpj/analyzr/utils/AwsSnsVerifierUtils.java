@@ -10,7 +10,7 @@ import java.security.cert.X509Certificate;
 import java.util.Base64;
 import java.util.Scanner;
 
-import cnpj.analyzr.payload.AwsSnsRequest;
+import cnpj.analyzr.payload.aws.AwsSnsRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

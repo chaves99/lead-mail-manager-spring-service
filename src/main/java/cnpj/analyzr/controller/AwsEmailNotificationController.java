@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cnpj.analyzr.payload.AwsSnsRequest;
 import cnpj.analyzr.payload.aws.AwsSnsMessageRequest;
+import cnpj.analyzr.payload.aws.AwsSnsRequest;
 import cnpj.analyzr.utils.AwsSnsVerifierUtils;
 import io.awspring.cloud.sns.annotation.handlers.NotificationMessage;
 import io.awspring.cloud.sns.annotation.handlers.NotificationSubject;
