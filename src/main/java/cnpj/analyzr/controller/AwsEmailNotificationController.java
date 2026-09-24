@@ -28,4 +28,10 @@ public class AwsEmailNotificationController {
         log.info("POST bounce - headers:{} body:{}", headers.toString(), body);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/delivered")
+    public ResponseEntity<?> delivered(@RequestHeader HttpHeaders headers, @RequestBody String body) {
+        log.info("POST delivered - headers:{} body:{}", headers.toString(), body);
+        return ResponseEntity.ok().build();
+    }
 }
