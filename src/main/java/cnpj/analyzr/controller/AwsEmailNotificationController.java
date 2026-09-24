@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cnpj.analyzr.payload.AwsSnsRequest;
+import cnpj.analyzr.payload.aws.AwsSnsMessageRequest;
 import cnpj.analyzr.utils.AwsSnsVerifierUtils;
 import io.awspring.cloud.sns.annotation.handlers.NotificationMessage;
 import io.awspring.cloud.sns.annotation.handlers.NotificationSubject;
@@ -41,9 +42,12 @@ public class AwsEmailNotificationController {
     public ResponseEntity<?> delivered(@RequestHeader HttpHeaders headers, @RequestBody String body) {
         log.info("POST delivered - headers:{} body:{}", headers.toString(), body);
         // log.info("POST delivered - subject:{} message:{}", subject, message);
-        headers.getFirst("x-amz-sns-message-type");
+        String headerMessageType = headers.getFirst("x-amz-sns-message-type");
         try {
-            AwsSnsVerifierUtils.verify(headers.getFirst("x-amz-sns-message-type"), objectMapper.readValue(body, AwsSnsRequest.class));
+            AwsSnsRequest value = objectMapper.readValue(body, AwsSnsRequest.class);
+            AwsSnsVerifierUtils.verify(headerMessageType, value);
+            AwsSnsMessageRequest message = objectMapper.readValue(value.message(), AwsSnsMessageRequest.class);
+            log.info("delivered - parsed: {}", message);
         } catch (Exception e) {
             log.error("delivered - error: ", e);
         }
