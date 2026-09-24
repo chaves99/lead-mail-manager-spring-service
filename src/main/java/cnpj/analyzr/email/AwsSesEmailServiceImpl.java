@@ -44,6 +44,7 @@ public class AwsSesEmailServiceImpl implements EmailServiceInterface {
             helper.setText(body, true);
 
             javaMailSender.send(mimeMessage);
+            log.info("send - email sent - recipient:{} from:{}", customerEmail, hostFrom);
             return new EmailResult(null, true, null);
         } catch (MessagingException e) {
             log.error("send - customerEmail:{} subject:{} exception: ", customerEmail, subject, e);

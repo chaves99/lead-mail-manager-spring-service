@@ -8,17 +8,21 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.awspring.cloud.sns.annotation.endpoint.NotificationMessageMapping;
+import cnpj.analyzr.payload.AwsSnsRequest;
+import cnpj.analyzr.utils.AwsSnsVerifierUtils;
 import io.awspring.cloud.sns.annotation.handlers.NotificationMessage;
 import io.awspring.cloud.sns.annotation.handlers.NotificationSubject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import tools.jackson.databind.ObjectMapper;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/aws-ses-notification")
 public class AwsEmailNotificationController {
+
+    private final ObjectMapper objectMapper;
 
     @PostMapping("/complaint")
     public ResponseEntity<?> complaing(@RequestHeader HttpHeaders headers, @RequestBody String body) {
@@ -33,11 +37,16 @@ public class AwsEmailNotificationController {
         return ResponseEntity.ok().build();
     }
 
-    @NotificationMessageMapping(path = "/delivered")
-    public ResponseEntity<?> delivered(@RequestHeader HttpHeaders headers, @RequestBody String body,
-            @NotificationSubject String subject, @NotificationMessage String message) {
+    @PostMapping("/delivered")
+    public ResponseEntity<?> delivered(@RequestHeader HttpHeaders headers, @RequestBody String body) {
         log.info("POST delivered - headers:{} body:{}", headers.toString(), body);
-        log.info("POST delivered - subject:{} message:{}", subject, message);
+        // log.info("POST delivered - subject:{} message:{}", subject, message);
+        headers.getFirst("x-amz-sns-message-type");
+        try {
+            AwsSnsVerifierUtils.verify(headers.getFirst("x-amz-sns-message-type"), objectMapper.readValue(body, AwsSnsRequest.class));
+        } catch (Exception e) {
+            log.error("delivered - error: ", e);
+        }
         return ResponseEntity.ok().build();
     }
 }
