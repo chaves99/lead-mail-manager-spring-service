@@ -33,8 +33,7 @@ public class AwsEmailNotificationController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/delivered")
-    @NotificationMessageMapping
+    @NotificationMessageMapping(path = "/delivered")
     public ResponseEntity<?> delivered(@RequestHeader HttpHeaders headers, @RequestBody String body,
             @NotificationSubject String subject, @NotificationMessage String message) {
         log.info("POST delivered - headers:{} body:{}", headers.toString(), body);

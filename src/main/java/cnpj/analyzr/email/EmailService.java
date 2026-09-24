@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class EmailService {
+public class EmailService implements EmailServiceInterface {
 
     @Value("${owner-email}")
     private String ownerEmail;
@@ -69,11 +69,4 @@ public class EmailService {
         return send(ownerEmail, subject, body);
     }
 
-    public static record EmailResult(String message, boolean success, String externalId) {
-
-        public EmailResult(Object message, boolean success, Object externalId) {
-            this(message != null ? message.toString() : null, success,
-                    externalId != null ? externalId.toString() : null);
-        }
-    }
 }

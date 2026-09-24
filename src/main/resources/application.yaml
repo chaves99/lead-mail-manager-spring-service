@@ -17,3 +17,8 @@ mailgun:
   # email to be the host of the email sent by the service
   hostFrom: ${MAILGUN_HOST_FROM:ItiMenu <support@itimenu.app>}
 
+aws:
+  region: ${AWS_REGION}
+  access-key: ${AWS_ACCESS_KEY}
+  secret-key: ${AWS_SECRET_KEY}
+

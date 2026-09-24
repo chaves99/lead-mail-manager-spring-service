@@ -3,6 +3,7 @@ package cnpj.analyzr.campaign;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.scheduling.annotation.Async;
@@ -15,8 +16,8 @@ import cnpj.analyzr.campaign.entity.res.CampaignDetailsRecordResponse;
 import cnpj.analyzr.campaign.row.CampaignRow;
 import cnpj.analyzr.campaign.row.CampaignRowRepository;
 import cnpj.analyzr.campaign.row.CampaignRowRepository.CampaignRowTotalsRecord;
-import cnpj.analyzr.email.EmailService;
-import cnpj.analyzr.email.EmailService.EmailResult;
+import cnpj.analyzr.email.EmailServiceInterface;
+import cnpj.analyzr.email.EmailServiceInterface.EmailResult;
 import cnpj.analyzr.lead.LeadRecord;
 import cnpj.analyzr.lead.LeadRepository;
 import cnpj.analyzr.template.Template;
@@ -30,7 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CampaignService {
 
-    private final EmailService emailSenderService;
+    @Qualifier("awsSesEmailServiceImpl")
+    private final EmailServiceInterface awsSesEmailServiceImpl;
 
     private final LeadRepository leadRepository;
     private final TemplateRepository templateRepository;
@@ -63,7 +65,7 @@ public class CampaignService {
 
                 String emailBody = EmailUtils.prepareEmailBody(rowId, template.body());
 
-                EmailResult result = emailSenderService.send(lead.email(),
+                EmailResult result = awsSesEmailServiceImpl.send(lead.email(),
                         template.subject(), emailBody);
 
                 campaignRowRepository.updateEmailResponse(rowId, result);

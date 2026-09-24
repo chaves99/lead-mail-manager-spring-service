@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cnpj.analyzr.email.EmailService;
+import cnpj.analyzr.email.EmailServiceInterface;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -21,7 +21,7 @@ public class TemplateController {
 
     private final TemplateRepository repository;
 
-    private final EmailService emailService;
+    private final EmailServiceInterface awsSesEmailServiceImpl;
 
     @PostMapping
     public ResponseEntity<Template> create(@RequestBody Template body) {
@@ -61,7 +61,7 @@ public class TemplateController {
 
         return repository.find(id)
                 .map(t -> {
-                    emailService.sendToOwner(t.subject(), t.body());
+                    awsSesEmailServiceImpl.sendToOwner(t.subject(), t.body());
                     return ResponseEntity.ok().build();
                 })
                 .orElse(ResponseEntity.notFound().build());
