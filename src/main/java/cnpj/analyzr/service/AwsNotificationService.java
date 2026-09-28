@@ -19,7 +19,6 @@ import tools.jackson.databind.ObjectMapper;
 @RequiredArgsConstructor
 public class AwsNotificationService {
 
-    private final ObjectMapper objectMapper;
     private final LeadRepository leadRepository;
     private final CampaignRowRepository campaignRowRepository;
 
@@ -54,9 +53,10 @@ public class AwsNotificationService {
                 .findAny()
                 .map(header -> {
                     if (header != null && header.value() != null) {
-                        AwsSesHeaderRequest sesHeaderRequest = objectMapper
-                                .readValue(header.value(), AwsSesHeaderRequest.class);
-                        return sesHeaderRequest != null ? sesHeaderRequest.campaignRowId() : null;
+                        Optional<AwsSesHeaderRequest> sesHeaderRequest = AwsSesHeaderRequest.fromHeader(header.value());
+                        return sesHeaderRequest.isPresent()
+                                ? sesHeaderRequest.get().campaignRowId()
+                                : null;
                     }
                     return null;
                 })

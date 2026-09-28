@@ -11,7 +11,6 @@ import cnpj.analyzr.payload.aws.AwsSesHeaderRequest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
-import tools.jackson.databind.ObjectMapper;
 
 @Slf4j
 @Service("awsSesEmailServiceImpl")
@@ -24,16 +23,12 @@ public class AwsSesEmailServiceImpl {
 
     private String ownerEmail;
 
-    private final ObjectMapper ObjectMapper;
-
-    public AwsSesEmailServiceImpl(ObjectMapper ObjectMapper,
-            JavaMailSender javaMailSender,
+    public AwsSesEmailServiceImpl(JavaMailSender javaMailSender,
             @Value("${owner-email}") String ownerEmail,
             @Value("${mailgun.hostFrom}") String hostFrom) {
         this.javaMailSender = javaMailSender;
         this.hostFrom = hostFrom;
         this.ownerEmail = ownerEmail;
-        this.ObjectMapper = ObjectMapper;
     }
 
     public void send(String customerEmail, String subject, String body, AwsSesHeaderRequest header)
@@ -48,7 +43,7 @@ public class AwsSesEmailServiceImpl {
         helper.setText(body, true);
 
         if (header != null) {
-            mimeMessage.addHeader("X-SES-MESSAGE-TAGS", ObjectMapper.writeValueAsString(header));
+            mimeMessage.addHeader("X-SES-MESSAGE-TAGS", header.toString());
         }
         javaMailSender.send(mimeMessage);
         log.info("send - email sent - recipient:{} from:{}", customerEmail, hostFrom);
