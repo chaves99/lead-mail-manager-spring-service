@@ -1,9 +1,9 @@
 package cnpj.analyzr.campaign;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.scheduling.annotation.Async;
@@ -16,10 +16,10 @@ import cnpj.analyzr.campaign.entity.res.CampaignDetailsRecordResponse;
 import cnpj.analyzr.campaign.row.CampaignRow;
 import cnpj.analyzr.campaign.row.CampaignRowRepository;
 import cnpj.analyzr.campaign.row.CampaignRowRepository.CampaignRowTotalsRecord;
-import cnpj.analyzr.email.EmailServiceInterface;
-import cnpj.analyzr.email.EmailServiceInterface.EmailResult;
+import cnpj.analyzr.email.AwsSesEmailServiceImpl;
 import cnpj.analyzr.lead.LeadRecord;
 import cnpj.analyzr.lead.LeadRepository;
+import cnpj.analyzr.payload.aws.AwsSesHeaderRequest;
 import cnpj.analyzr.template.Template;
 import cnpj.analyzr.template.TemplateRepository;
 import cnpj.analyzr.utils.EmailUtils;
@@ -31,8 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CampaignService {
 
-    @Qualifier("awsSesEmailServiceImpl")
-    private final EmailServiceInterface awsSesEmailServiceImpl;
+    private final AwsSesEmailServiceImpl awsSesEmailServiceImpl;
 
     private final LeadRepository leadRepository;
     private final TemplateRepository templateRepository;
@@ -52,37 +51,28 @@ public class CampaignService {
 
             List<LeadRecord> leads = leadRepository.find(body.filter().withLimit(body.limit()));
 
-            Long campaignId = campaignRepository.insert(body.description(),
-                    template.id(), leads.size());
+            Long campaignId = campaignRepository.insert(body.description(), template.id(), leads.size());
 
             log.info("execute - sending email for {} customers, template_id: {}", leads.size(), template.id());
 
-            int countErrors = 0;
-            int countSuccess = 0;
+            int counter = 0;
 
             for (var lead : leads) {
                 long rowId = campaignRowRepository.insertRow(campaignId, lead.id());
 
                 String emailBody = EmailUtils.prepareEmailBody(rowId, template.body());
 
-                EmailResult result = awsSesEmailServiceImpl.send(lead.email(),
-                        template.subject(), emailBody);
+                awsSesEmailServiceImpl.send(lead.email(), template.subject(), emailBody,
+                        new AwsSesHeaderRequest(rowId));
 
-                campaignRowRepository.updateEmailResponse(rowId, result);
-                if (result.success()) {
-                    int sendQuantity = lead.send() == null ? 1 : (lead.send() + 1);
-                    leadRepository.updatePlusCounter(lead.id(), sendQuantity);
-                    countSuccess++;
-                } else {
-                    log.warn("error to send email:{} meassage:{}", lead.email(), result.message());
-                    countErrors++;
-                }
+                campaignRowRepository.updateEmailStatus(rowId, CampaignRow.Status.PENDING);
+                int sendQuantity = lead.send() == null ? 1 : (lead.send() + 1);
+                leadRepository.updatePlusCounter(lead.id(), sendQuantity);
             }
 
             long endTime = ((System.currentTimeMillis() - startTime) / 1000);
 
-            log.info("execute - finished in {} seconds success:{} error:{}",
-                    endTime, countSuccess, countErrors);
+            log.info("execute - finished in {} seconds counter:{}", endTime, counter);
         } catch (Exception e) {
             log.error("execute: ", e);
         }

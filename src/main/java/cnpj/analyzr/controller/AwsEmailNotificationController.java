@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import cnpj.analyzr.payload.aws.AwsSnsMessageRequest;
 import cnpj.analyzr.payload.aws.AwsSnsRequest;
+import cnpj.analyzr.service.AwsNotificationService;
 import cnpj.analyzr.utils.AwsSnsVerifierUtils;
 import io.awspring.cloud.sns.annotation.handlers.NotificationMessage;
 import io.awspring.cloud.sns.annotation.handlers.NotificationSubject;
@@ -25,9 +26,12 @@ public class AwsEmailNotificationController {
 
     private final ObjectMapper objectMapper;
 
+    private final AwsNotificationService awsNotificationService;
+
     @PostMapping("/complaint")
     public ResponseEntity<?> complaing(@RequestHeader HttpHeaders headers, @RequestBody String body) {
         log.info("POST complaint - headers:{} body:{}", headers.toString(), body);
+        handleNotification(headers, body);
         return ResponseEntity.ok().build();
     }
 
@@ -35,23 +39,26 @@ public class AwsEmailNotificationController {
     public ResponseEntity<?> bounce(@RequestHeader HttpHeaders headers, @RequestBody String body,
             @NotificationSubject String subject, @NotificationMessage String message) {
         log.info("POST bounce - headers:{} body:{}", headers.toString(), body);
+        handleNotification(headers, body);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/delivered")
     public ResponseEntity<?> delivered(@RequestHeader HttpHeaders headers, @RequestBody String body) {
         log.info("POST delivered - headers:{} body:{}", headers.toString(), body);
-        // log.info("POST delivered - subject:{} message:{}", subject, message);
+        handleNotification(headers, body);
+        return ResponseEntity.ok().build();
+    }
+
+    private void handleNotification(HttpHeaders headers, String body) {
         String headerMessageType = headers.getFirst("x-amz-sns-message-type");
         try {
             AwsSnsRequest value = objectMapper.readValue(body, AwsSnsRequest.class);
             AwsSnsVerifierUtils.verify(headerMessageType, value);
-            log.info("delivered - parsing json message:{}", value.message());
             AwsSnsMessageRequest message = objectMapper.readValue(value.message(), AwsSnsMessageRequest.class);
-            log.info("delivered - parsed: {}", message);
+            awsNotificationService.process(message);
         } catch (Exception e) {
             log.error("delivered - error: ", e);
         }
-        return ResponseEntity.ok().build();
     }
 }

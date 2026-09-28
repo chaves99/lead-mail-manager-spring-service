@@ -1,8 +1,10 @@
 package cnpj.analyzr.email;
 
+import java.util.Map;
+
 public interface EmailServiceInterface {
 
-    public EmailResult send(String customerEmail, String subject, String body);
+    public EmailResult send(String customerEmail, String subject, String body, Map<String, String> headers);
 
     public EmailResult sendToOwner(String subject, String body);
 

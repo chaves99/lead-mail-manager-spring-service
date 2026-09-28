@@ -64,6 +64,14 @@ public class LeadRepository {
         }
     }
 
+    public void updateUnrechable(Long id) {
+        try {
+            jdbcTemplate.update("UPDATE lead SET unreachable = true WHERE id = :id", Map.of("id", id));
+        } catch (Exception e) {
+            log.error("updateUnrechable - id:{} exception: ", id, e);
+        }
+    }
+
     public Optional<LeadRecord> find(Long id) {
         try {
             return Optional.ofNullable(
@@ -85,7 +93,23 @@ public class LeadRepository {
         return Optional.empty();
     }
 
-    public Optional<Long> find(String email) {
+    public Optional<LeadRecord> find(String email) {
+        try {
+            String sql = "SELECT * FROM lead WHERE email = :email";
+            var obj = jdbcTemplate.queryForObject(sql, Map.of("email", email), (rs, rn) -> buildFromResultSet(rs));
+            return Optional.ofNullable(obj);
+        } catch (CannotGetJdbcConnectionException e) {
+            log.error("find by email:{} exception:", email, e);
+            throw e;
+        } catch (IncorrectResultSizeDataAccessException e) {
+            return Optional.empty();
+        } catch (Exception e) {
+            log.error("find by email:{} exception: ", email, e.getMessage());
+            return Optional.empty();
+        }
+    }
+
+    public Optional<Long> findId(String email) {
         try {
             String sql = "SELECT id FROM lead WHERE email = :email";
             Long id = jdbcTemplate.queryForObject(sql, Map.of("email", email), Long.class);

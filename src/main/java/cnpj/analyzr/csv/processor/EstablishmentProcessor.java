@@ -66,7 +66,7 @@ public class EstablishmentProcessor implements CsvProcessor<Establishment> {
     }
 
     private Optional<Long> findLead(String email) {
-        return leadRepository.find(email);
+        return leadRepository.findId(email);
     }
 
     @Override

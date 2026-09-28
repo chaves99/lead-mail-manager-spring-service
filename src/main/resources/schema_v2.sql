@@ -9,7 +9,8 @@ CREATE TABLE IF NOT EXISTS lead(
     open INT NOT NULL DEFAULT FALSE,
     click INT NOT NULL DEFAULT FALSE,
     last_click_date DATE,
-    unsubscribed BOOLEAN DEFAULT FALSE
+    unsubscribed BOOLEAN DEFAULT FALSE,
+    unreachable BOOLEAN
 );
 CREATE INDEX lead_id_index ON lead (id);
 CREATE INDEX lead_email_index ON lead (email);
@@ -71,6 +72,7 @@ CREATE TABLE IF NOT EXISTS campaign_row(
     opened BOOLEAN NOT NULL DEFAULT FALSE,
     clicked BOOLEAN NOT NULL DEFAULT FALSE,
     clicked_date DATE,
+    status SMALLINT,
     campaign_id BIGINT NOT NULL REFERENCES campaign(id)
 );
 CREATE INDEX campaign_row_index ON campaign_row(id);

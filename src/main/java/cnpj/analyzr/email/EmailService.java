@@ -43,7 +43,7 @@ public class EmailService implements EmailServiceInterface {
     }
 
     @SuppressWarnings("unchecked")
-    public EmailResult send(String customerEmail, String subject, String body) {
+    public EmailResult send(String customerEmail, String subject, String body, Map<String, String> header) {
         try {
             MultiValueMap<String, Object> parts = new LinkedMultiValueMap<>();
             parts.add("from", hostFrom);
@@ -66,7 +66,7 @@ public class EmailService implements EmailServiceInterface {
 
     public EmailResult sendToOwner(String subject, String body) {
         log.info("sendToOwner");
-        return send(ownerEmail, subject, body);
+        return send(ownerEmail, subject, body, null);
     }
 
 }
