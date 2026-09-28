@@ -1,7 +1,6 @@
 package cnpj.analyzr.email;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -49,7 +48,7 @@ public class AwsSesEmailServiceImpl {
         helper.setText(body, true);
 
         if (header != null) {
-            mimeMessage.setHeader("X-SES-MESSAGE-TAGS", ObjectMapper.writeValueAsString(header));
+            mimeMessage.addHeader("X-SES-MESSAGE-TAGS", ObjectMapper.writeValueAsString(header));
         }
         javaMailSender.send(mimeMessage);
         log.info("send - email sent - recipient:{} from:{}", customerEmail, hostFrom);
@@ -57,6 +56,6 @@ public class AwsSesEmailServiceImpl {
 
     public void sendToOwner(String subject, String body) throws MessagingException {
         log.info("sendToOwner");
-        send(ownerEmail, subject, body, new AwsSesHeaderRequest(null));
+        send(ownerEmail, subject, body, null);
     }
 }
