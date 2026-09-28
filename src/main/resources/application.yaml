@@ -8,9 +8,6 @@ spring:
     username: ${DB_USER:leaduser}
     password: ${DB_PASS:leadpass}
     driver-class-name: org.postgresql.Driver
-  jackson:
-    deserialization:
-      accept-case-insensitive-enums: true
 
 owner-email: viniciusbaleia1999@gmail.com
 

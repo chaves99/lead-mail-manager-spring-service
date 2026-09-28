@@ -3,6 +3,11 @@ package cnpj.analyzr.payload.aws;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
 public record AwsSnsMessageRequest(AwsSnsNotificationTypeRequest notificationType, AwsSnsMessageMailRequest mail) {
 
     public static record AwsSnsMessageMailRequest(List<String> destination,
@@ -53,7 +58,22 @@ public record AwsSnsMessageRequest(AwsSnsNotificationTypeRequest notificationTyp
     public static record AwsSnsMessageHeaderRequest(String name, String value) {
     }
 
+    @Getter
+    @RequiredArgsConstructor
     public static enum AwsSnsNotificationTypeRequest {
-        DELIVERY, BOUNCE, COMPLAINT;
+        DELIVERY("Delivery"), BOUNCE("Bounce"), COMPLAINT("Complaint");
+
+        private final String value;
+
+        @JsonCreator
+        public static AwsSnsNotificationTypeRequest factory(String value) {
+            for (var e : values()) {
+                if (e.getValue().equals(value)) {
+                    return e;
+                }
+            }
+            return null;
+        }
+
     }
 }
