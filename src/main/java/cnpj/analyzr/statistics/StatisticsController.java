@@ -44,7 +44,7 @@ public class StatisticsController {
         if (campaignRowId == null || urlTarget == null) {
             return ResponseEntity.ok().build();
         }
-        service.trackClick(campaignRowId);
+        // service.trackClick(campaignRowId);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .location(URI.create(urlTarget))
