@@ -167,7 +167,6 @@ public class LeadRepository {
                 SELECT COUNT(DISTINCT l.id) from lead l
                 LEFT JOIN establishment es ON (l.id = es.lead_id)
                 WHERE 1=1
-                AND unreachable IS TRUE 
                 """);
 
         Map<String, Object> map = buildQuery(filter, sql);
