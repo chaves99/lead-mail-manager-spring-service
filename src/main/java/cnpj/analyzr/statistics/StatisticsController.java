@@ -29,10 +29,10 @@ public class StatisticsController {
         ResponseEntity<Object> responseEntity = ResponseEntity
                 .status(HttpStatus.OK)
                 .build();
-        // if (campaignRowId == null) {
-        //     return responseEntity;
-        // }
-        // service.opened(campaignRowId);
+        if (campaignRowId == null) {
+            return responseEntity;
+        }
+        service.opened(campaignRowId);
         return responseEntity;
     }
 
@@ -44,7 +44,7 @@ public class StatisticsController {
         if (campaignRowId == null || urlTarget == null) {
             return ResponseEntity.ok().build();
         }
-        // service.trackClick(campaignRowId);
+        service.trackClick(campaignRowId);
         return ResponseEntity
                 .status(HttpStatus.FOUND)
                 .location(URI.create(urlTarget))
