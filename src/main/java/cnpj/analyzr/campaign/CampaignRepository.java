@@ -27,6 +27,11 @@ public class CampaignRepository {
                 SELECT c.*,
                     COUNT(*) FILTER (WHERE cr.success IS TRUE) as success,
                     COUNT(*) FILTER (WHERE cr.success IS NOT TRUE AND cr.success IS NOT NULL) as failure,
+                    COUNT(*) FILTER (WHERE cr.status = 1) as pending,
+                    COUNT(*) FILTER (WHERE cr.status = 2) as delivered,
+                    COUNT(*) FILTER (WHERE cr.status = 3) as bounced,
+                    COUNT(*) FILTER (WHERE cr.status = 4) as complained,
+                    COUNT(*) FILTER (WHERE cr.status = 5) as unknow_error,
                     te.id as te_id, te.name as te_name
                 FROM campaign c
                 LEFT JOIN campaign_row cr
@@ -45,6 +50,11 @@ public class CampaignRepository {
                     .success(rs.getInt("success"))
                     .failure(rs.getInt("failure"))
                     .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                    .pending(rs.getInt("pending"))
+                    .delivered(rs.getInt("delivered"))
+                    .bounced(rs.getInt("bounced"))
+                    .complained(rs.getInt("complained"))
+                    .unknowError(rs.getInt("unknow_error"))
                     .build();
         });
     }
