@@ -35,15 +35,15 @@ public class StatisticsService {
     @Async
     public void trackClick(Long campaignRowId) {
         try {
-        campaignRowRepository.updateClick(campaignRowId);
-        campaignRowRepository
-                .findById(campaignRowId)
-                .flatMap(cr -> leadRepository.find(cr.leadId()))
-                .ifPresent(lead -> {
-                    log.info("email clicked: {}", lead.email());
-                    leadRepository.updateClick(lead.id(), lead.click() + 1);
-                });
-        } catch(Exception e) {
+            campaignRowRepository.updateClick(campaignRowId);
+            campaignRowRepository
+                    .findById(campaignRowId)
+                    .flatMap(cr -> leadRepository.find(cr.leadId()))
+                    .ifPresent(lead -> {
+                        log.info("email clicked: {}", lead.email());
+                        leadRepository.updateClick(lead.id(), lead.click() + 1);
+                    });
+        } catch (Exception e) {
             log.info("trackClick - excpetion: {}", e.getMessage());
         }
     }

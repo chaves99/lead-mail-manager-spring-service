@@ -25,21 +25,22 @@ public class StatisticsController {
     @GetMapping("/track-open")
     public ResponseEntity<?> emailOpened(@RequestHeader Map<String, String> headers,
             @RequestParam(value = "campaign_row_id", required = false) Long campaignRowId) {
-        log.info("requesting image - headers: {}", headers);
+        log.info("emailOpened - headers: {}", headers);
         ResponseEntity<Object> responseEntity = ResponseEntity
                 .status(HttpStatus.OK)
                 .build();
-        if (campaignRowId == null) {
-            return responseEntity;
-        }
-        service.opened(campaignRowId);
+        // if (campaignRowId == null) {
+        //     return responseEntity;
+        // }
+        // service.opened(campaignRowId);
         return responseEntity;
     }
 
     @GetMapping("/track-click")
-    public ResponseEntity<?> trackClick(
+    public ResponseEntity<?> trackClick(@RequestHeader Map<String, String> headers,
             @RequestParam(name = "campaign_row_id", required = false) Long campaignRowId,
             @RequestParam(name = "url_target", required = false) String urlTarget) {
+        log.info("trackClick - headers: {}", headers);
         if (campaignRowId == null || urlTarget == null) {
             return ResponseEntity.ok().build();
         }
