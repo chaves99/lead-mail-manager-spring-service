@@ -1,7 +1,7 @@
 package cnpj.analyzr.statistics;
 
 import java.net.URI;
-import java.net.http.HttpHeaders;
+import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,8 +23,8 @@ public class StatisticsController {
     private final StatisticsService service;
 
     @GetMapping("/track-open")
-    public ResponseEntity<?> emailOpened(@RequestHeader HttpHeaders headers,
-            @RequestParam("campaign_row_id") Long campaignRowId) {
+    public ResponseEntity<?> emailOpened(@RequestHeader Map<String, String> headers,
+            @RequestParam(value = "campaign_row_id", required = false) Long campaignRowId) {
         log.info("requesting image - headers: {}", headers);
         ResponseEntity<Object> responseEntity = ResponseEntity
                 .status(HttpStatus.OK)
