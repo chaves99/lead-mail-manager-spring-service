@@ -3,6 +3,7 @@ package cnpj.analyzr.campaign.row;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,14 +40,14 @@ public class CampaignRowRepository {
     }
 
     private CampaignRow buildEntity(ResultSet rs) throws SQLException {
-        Date sendDate = rs.getDate("send_date");
+        Timestamp sendDate = rs.getTimestamp("send_date");
         Date clickedDate = rs.getDate("clicked_date");
         return CampaignRow.builder()
                 .id(rs.getLong("id"))
                 .leadId(rs.getLong("lead_id"))
                 .success(rs.getBoolean("success"))
                 .errorMsg(rs.getString("error_msg"))
-                .sendDate(sendDate != null ? sendDate.toLocalDate() : null)
+                .sendDate(sendDate != null ? sendDate.toLocalDateTime() : null)
                 .opened(rs.getBoolean("opened"))
                 .clicked(rs.getBoolean("clicked"))
                 .clickedDate(clickedDate != null ? clickedDate.toLocalDate() : null)

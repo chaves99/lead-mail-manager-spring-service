@@ -1,5 +1,7 @@
 package cnpj.analyzr.statistics;
 
+import java.time.LocalDateTime;
+
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +19,21 @@ public class StatisticsService {
 
     private final CampaignRowRepository campaignRowRepository;
 
-    public void opened(Long campaignRowId) {
+    public void trackOpen(Long campaignRowId) {
         try {
-            campaignRowRepository.updateOpen(campaignRowId);
             campaignRowRepository
                     .findById(campaignRowId)
-                    .flatMap(cr -> leadRepository.find(cr.leadId()))
-                    .ifPresent(lead -> {
-                        log.info("email opened: {}", lead.email());
-                        leadRepository.updateOpen(lead.id(), lead.open() + 1);
+                    .ifPresent(campaignRow -> {
+                        if (campaignRow.sendDate().isBefore(LocalDateTime.now().minusMinutes(2))) {
+                            campaignRowRepository.updateOpen(campaignRowId);
+                            leadRepository.find(campaignRow.leadId())
+                                    .ifPresent(lead -> {
+                                        log.info("trackOpen - email opened: {}", lead.email());
+                                        leadRepository.updateOpen(lead.id(), lead.open() + 1);
+                                    });
+                        } else {
+                            log.info("trackOpen - NOT IN RANGE TIME - campaign row id: {}", campaignRowId);
+                        }
                     });
         } catch (Exception e) {
             log.error("opened - exception: ", e);
@@ -35,13 +43,18 @@ public class StatisticsService {
     @Async
     public void trackClick(Long campaignRowId) {
         try {
-            campaignRowRepository.updateClick(campaignRowId);
             campaignRowRepository
                     .findById(campaignRowId)
-                    .flatMap(cr -> leadRepository.find(cr.leadId()))
-                    .ifPresent(lead -> {
-                        log.info("email clicked: {}", lead.email());
-                        leadRepository.updateClick(lead.id(), lead.click() + 1);
+                    .ifPresent(campaignRow -> {
+                        if (campaignRow.sendDate().isBefore(LocalDateTime.now().minusMinutes(2))) {
+                            campaignRowRepository.updateClick(campaignRowId);
+                            leadRepository.find(campaignRow.leadId()).ifPresent(lead -> {
+                                log.info("email clicked: {}", lead.email());
+                                leadRepository.updateClick(lead.id(), lead.click() + 1);
+                            });
+                        } else {
+                            log.info("trackClick - NOT IN RANGE TIME - campaign row id: {}", campaignRowId);
+                        }
                     });
         } catch (Exception e) {
             log.info("trackClick - excpetion: {}", e.getMessage());

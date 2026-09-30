@@ -1,6 +1,7 @@
 package cnpj.analyzr.campaign.row;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import lombok.AllArgsConstructor;
@@ -13,7 +14,7 @@ public record CampaignRow(
         Long leadId,
         boolean success,
         String errorMsg,
-        LocalDate sendDate,
+        LocalDateTime sendDate,
         boolean opened,
         boolean clicked,
         LocalDate clickedDate,
