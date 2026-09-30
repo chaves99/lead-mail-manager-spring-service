@@ -18,8 +18,7 @@ public record CampaignRow(
         boolean opened,
         boolean clicked,
         LocalDate clickedDate,
-        Long campaignId,
-        String externalId) {
+        Long campaignId) {
 
     @Getter
     @AllArgsConstructor

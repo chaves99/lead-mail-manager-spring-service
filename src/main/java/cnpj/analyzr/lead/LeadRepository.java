@@ -171,6 +171,7 @@ public class LeadRepository {
 
         Map<String, Object> map = buildQuery(filter, sql);
 
+        System.out.println(sql);
         return jdbcTemplate.queryForObject(sql.toString(), map, Integer.class);
     }
 
