@@ -32,7 +32,7 @@ public class StatisticsController {
         if (campaignRowId == null) {
             return responseEntity;
         }
-        service.opened(campaignRowId);
+        service.trackOpen(campaignRowId);
         return responseEntity;
     }
 
