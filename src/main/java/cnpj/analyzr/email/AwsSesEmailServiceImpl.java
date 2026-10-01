@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service("awsSesEmailServiceImpl")
-// @RequiredArgsConstructor
 public class AwsSesEmailServiceImpl {
 
     private final JavaMailSender javaMailSender;

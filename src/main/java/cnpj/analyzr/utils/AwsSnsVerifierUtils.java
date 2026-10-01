@@ -17,31 +17,21 @@ import lombok.extern.slf4j.Slf4j;
 public record AwsSnsVerifierUtils() {
 
     public static void verify(String messageType, AwsSnsRequest msg) {
-        log.info("verify - messageType:{} msg:{}", messageType, msg);
         if (msg.signatureVersion().equals("1")) {
             // Check the signature and throw an exception if the signature verification
             // fails.
-            if (isMessageSignatureValid(msg)) {
-                log.info(">>Signature verification succeeded");
-            } else {
-                log.info(">>Signature verification failed");
+            if (!isMessageSignatureValid(msg)) {
+                log.warn("Signature verification failed - messageType:{} message", messageType, msg);
                 throw new SecurityException("Signature verification failed.");
             }
         } else {
-            log.info(">>Unexpected signature version. Unable to verify signature.");
+            log.info("Unexpected signature version. Unable to verify signature - version", msg.signatureVersion());
             throw new SecurityException("Unexpected signature version. Unable to verify signature.");
         }
 
         // Process the message based on type.
         if (messageType.equals("Notification")) {
-            // Do something with the Message and Subject.
-            // Just log the subject (if it exists) and the message.
-            String logMsgAndSubject = ">>Notification received from topic " + msg.topicArn();
-            if (msg.subject() != null) {
-                logMsgAndSubject += " Subject: " + msg.subject();
-            }
-            logMsgAndSubject += " Message: " + msg.message();
-            log.info(logMsgAndSubject);
+            // Do nothing
         } else if (messageType.equals("SubscriptionConfirmation")) {
             // You should make sure that this subscription is from the topic you expect.
             // Compare topicARN to your list of topics
@@ -54,7 +44,7 @@ public record AwsSnsVerifierUtils() {
                 while (sc.hasNextLine()) {
                     sb.append(sc.nextLine());
                 }
-                log.info(">>Subscription confirmation (" + msg.subscribeUrl() + ") Return value: " + sb.toString());
+                log.info("Subscription confirmation (" + msg.subscribeUrl() + ") Return value: " + sb.toString());
                 // Process the return value to ensure the endpoint is subscribed.
             } catch (IOException e) {
                 log.error("verify - exception:", e);
@@ -64,12 +54,11 @@ public record AwsSnsVerifierUtils() {
             // For example, take action if unsubscribing should not have occurred.
             // You can read the SubscribeURL from this message and
             // re-subscribe the endpoint.
-            log.info(">>Unsubscribe confirmation: " + msg.message());
+            log.info("Unsubscribe confirmation: " + msg.message());
         } else {
             // Handle unknown message type.
-            log.info(">>Unknown message type.");
+            log.info("Unknown message type: {}.", messageType);
         }
-        log.info(">>Done processing message: " + msg.messageId());
     }
 
     private static boolean isMessageSignatureValid(AwsSnsRequest msg) {
@@ -80,15 +69,6 @@ public record AwsSnsVerifierUtils() {
                 throw new SecurityException("SigningCertURL was not using HTTPS: " + uri.toString());
             }
 
-            log.info("verifyMessageSignatureURL - certURI(host):" + uri.getHost());
-            // if (!endpoint.equals(certUri.getHost())) {
-            //     throw new SecurityException(
-            //             String.format("SigningCertUrl does not match expected endpoint. " +
-            //                     "Expected %s but received endpoint was %s.",
-            //                     endpoint, certUri.getHost()));
-            //
-            // }
-        
             InputStream inStream = url.openStream();
             CertificateFactory cf = CertificateFactory.getInstance("X.509");
             X509Certificate cert = (X509Certificate) cf.generateCertificate(inStream);

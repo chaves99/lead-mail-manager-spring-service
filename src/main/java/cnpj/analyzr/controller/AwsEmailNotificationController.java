@@ -29,7 +29,7 @@ public class AwsEmailNotificationController {
     private final AwsNotificationService awsNotificationService;
 
     @PostMapping("/complaint")
-    public ResponseEntity<?> complaing(@RequestHeader HttpHeaders headers, @RequestBody String body) {
+    public ResponseEntity<?> complain(@RequestHeader HttpHeaders headers, @RequestBody String body) {
         log.info("POST complaint - headers:{} body:{}", headers.toString(), body);
         handleNotification(headers, body);
         return ResponseEntity.ok().build();

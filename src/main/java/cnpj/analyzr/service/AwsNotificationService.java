@@ -63,13 +63,9 @@ public class AwsNotificationService {
                 .flatMap(campaignRowId -> campaignRowRepository.findById(campaignRowId));
     }
 
-    private void updateLead(Long leadId, CampaignRow.Status status) {
-    }
-
     private void updateStatus(AwsSnsMessageRequest message, CampaignRow.Status status) {
         getCampaignRowId(message).ifPresentOrElse(campaignRow -> {
             campaignRowRepository.updateEmailStatus(campaignRow.id(), status);
-            updateLead(campaignRow.leadId(), status);
             leadRepository
                     .find(campaignRow.leadId())
                     .ifPresentOrElse(lead -> {

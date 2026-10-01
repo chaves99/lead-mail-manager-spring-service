@@ -68,7 +68,7 @@ CREATE TABLE IF NOT EXISTS campaign_row(
     lead_id BIGINT NOT NULL REFERENCES lead(id),
     success BOOLEAN DEFAULT FALSE,
     error_msg TEXT,
-    send_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    send_date TIMESTAMP NOT NULL DEFAULT CURRENT_DATE,
     opened BOOLEAN NOT NULL DEFAULT FALSE,
     clicked BOOLEAN NOT NULL DEFAULT FALSE,
     clicked_date DATE,
