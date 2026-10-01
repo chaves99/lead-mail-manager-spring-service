@@ -74,6 +74,7 @@ public class AwsNotificationService {
 
                         if (status.equals(CampaignRow.Status.BOUNCED)
                                 || status.equals(CampaignRow.Status.COMPLAINED)) {
+                            log.info("updateStatus - marking as unrechable - status:{} email:{}", status, lead.email());
                             leadRepository.updateUnrechable(lead.id());
                         }
                     }, () -> log.warn("process - lead not found"));

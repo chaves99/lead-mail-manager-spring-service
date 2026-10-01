@@ -31,8 +31,6 @@ public class StatisticsService {
                                         log.info("trackOpen - email opened: {}", lead.email());
                                         leadRepository.updateOpen(lead.id(), lead.open() + 1);
                                     });
-                        } else {
-                            log.info("trackOpen - NOT IN RANGE TIME - campaign row id: {}", campaignRowId);
                         }
                     });
         } catch (Exception e) {
@@ -52,8 +50,6 @@ public class StatisticsService {
                                 log.info("email clicked: {}", lead.email());
                                 leadRepository.updateClick(lead.id(), lead.click() + 1);
                             });
-                        } else {
-                            log.info("trackClick - NOT IN RANGE TIME - campaign row id: {}", campaignRowId);
                         }
                     });
         } catch (Exception e) {
