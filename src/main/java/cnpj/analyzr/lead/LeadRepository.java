@@ -34,7 +34,7 @@ public class LeadRepository {
     }
 
     public void unsubscribe(Long id) {
-        String sql = "UPDATE lead SET unsubscribe = true WHERE id = :id";
+        String sql = "UPDATE lead SET unsubscribed = true WHERE id = :id";
         jdbcTemplate.update(sql, Map.of("id", id));
     }
 
