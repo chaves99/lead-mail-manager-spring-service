@@ -22,6 +22,7 @@ import cnpj.analyzr.payload.aws.AwsSesHeaderRequest;
 import cnpj.analyzr.template.Template;
 import cnpj.analyzr.template.TemplateRepository;
 import cnpj.analyzr.utils.EmailUtils;
+import jakarta.mail.internet.AddressException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -37,6 +38,8 @@ public class CampaignService {
     private final CampaignRepository campaignRepository;
     private final CampaignRowRepository campaignRowRepository;
 
+    // jakarta.mail.internet.AddressException: Domain ends with dot in string
+    // ``restaurantetoquedesabor12@gmail.''
     @Async("threadPoolTaskExecutor")
     public void execute(CampaignExecuteRecordRequest body) {
         log.info("execute - body:{}", body);
@@ -61,13 +64,18 @@ public class CampaignService {
 
                 String emailBody = EmailUtils.prepareEmailBody(lead, rowId, template.body());
 
-                awsSesEmailServiceImpl.send(lead, template.subject(), emailBody,
-                        new AwsSesHeaderRequest(rowId));
+                try {
+                    awsSesEmailServiceImpl.send(lead, template.subject(), emailBody,
+                            new AwsSesHeaderRequest(rowId));
 
-                campaignRowRepository.updateEmailStatus(rowId, CampaignRow.Status.PENDING);
-                int sendQuantity = lead.send() == null ? 1 : (lead.send() + 1);
-                leadRepository.updatePlusCounter(lead.id(), sendQuantity);
-                counter++;
+                    campaignRowRepository.updateEmailStatus(rowId, CampaignRow.Status.PENDING);
+                    int sendQuantity = lead.send() == null ? 1 : (lead.send() + 1);
+                    leadRepository.updatePlusCounter(lead.id(), sendQuantity);
+                    counter++;
+                } catch (AddressException e) {
+                    log.warn("execute - AddressException:{} email:{}", e.getMessage(), lead.email());
+                    leadRepository.unsubscribe(lead.id());
+                }
             }
 
             long endTime = ((System.currentTimeMillis() - startTime) / 1000);
