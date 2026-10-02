@@ -37,7 +37,7 @@ public class LeadController {
         try {
             service.unsubscribe(leadId, rowId);
         } catch (HttpStatusException e) {
-            ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build();
         }
         return ResponseEntity
                 .status(HttpStatus.FOUND)
