@@ -46,7 +46,7 @@ public class AwsSesEmailServiceImpl {
             mimeMessage.addHeader("X-SES-MESSAGE-TAGS", header.toString());
         }
         javaMailSender.send(mimeMessage);
-        log.info("send - email sent - recipient:{} from:{}", lead.email(), hostFrom);
+        // log.info("send - email sent - recipient:{} from:{}", lead.email(), hostFrom);
     }
 
     public void send(String emailTo, String subject, String body, AwsSesHeaderRequest header)
@@ -64,11 +64,11 @@ public class AwsSesEmailServiceImpl {
             mimeMessage.addHeader("X-SES-MESSAGE-TAGS", header.toString());
         }
         javaMailSender.send(mimeMessage);
-        log.info("send - email sent - recipient:{} from:{}", emailTo, hostFrom);
+        // log.info("send - email sent - recipient:{} from:{}", emailTo, hostFrom);
     }
 
     public void sendToOwner(String subject, String body) throws MessagingException {
-        log.info("sendToOwner");
+        log.info("sendToOwner - subject:{}", subject);
         send(ownerEmail, subject, body, null);
     }
 }

@@ -67,6 +67,7 @@ public class CampaignService {
                 campaignRowRepository.updateEmailStatus(rowId, CampaignRow.Status.PENDING);
                 int sendQuantity = lead.send() == null ? 1 : (lead.send() + 1);
                 leadRepository.updatePlusCounter(lead.id(), sendQuantity);
+                counter++;
             }
 
             long endTime = ((System.currentTimeMillis() - startTime) / 1000);
