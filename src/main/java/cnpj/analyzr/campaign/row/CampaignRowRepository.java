@@ -39,6 +39,19 @@ public class CampaignRowRepository {
         }
     }
 
+    public Optional<CampaignRow> findByIdAndLeadId(Long id, Long leadId) {
+        try {
+            String sql = "SELECT * FROM campaign_row WHERE id = :id AND lead_id = :lead_id";
+            Map<String, Long> of = Map.of("id", id, "lead_id", leadId);
+            return Optional.ofNullable(jdbcTemplate.queryForObject(sql, of, (rs, nr) -> {
+                return buildEntity(rs);
+            }));
+        } catch (Exception e) {
+            log.error("findByIdAndLeadId id:{} leadId:{} exception: ", id, leadId, e);
+            return Optional.empty();
+        }
+    }
+
     private CampaignRow buildEntity(ResultSet rs) throws SQLException {
         Timestamp sendDate = rs.getTimestamp("send_date");
         Date clickedDate = rs.getDate("clicked_date");

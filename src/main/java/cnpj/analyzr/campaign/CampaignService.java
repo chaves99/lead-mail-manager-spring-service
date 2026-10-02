@@ -1,7 +1,6 @@
 package cnpj.analyzr.campaign;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -57,12 +56,12 @@ public class CampaignService {
 
             int counter = 0;
 
-            for (var lead : leads) {
+            for (LeadRecord lead : leads) {
                 long rowId = campaignRowRepository.insertRow(campaignId, lead.id());
 
-                String emailBody = EmailUtils.prepareEmailBody(rowId, template.body());
+                String emailBody = EmailUtils.prepareEmailBody(lead, rowId, template.body());
 
-                awsSesEmailServiceImpl.send(lead.email(), template.subject(), emailBody,
+                awsSesEmailServiceImpl.send(lead, template.subject(), emailBody,
                         new AwsSesHeaderRequest(rowId));
 
                 campaignRowRepository.updateEmailStatus(rowId, CampaignRow.Status.PENDING);
