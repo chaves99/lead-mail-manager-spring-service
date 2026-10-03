@@ -29,14 +29,14 @@ public class AwsEmailNotificationController {
     private final AwsNotificationService awsNotificationService;
 
     @PostMapping("/complaint")
-    public ResponseEntity<?> complain(@RequestHeader HttpHeaders headers, @RequestBody String body) {
+    public ResponseEntity<?> complain(@RequestHeader HttpHeaders headers, @RequestBody(required = false) String body) {
         log.info("POST complaint - headers:{} body:{}", headers.toString(), body);
         handleNotification(headers, body);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/bounce")
-    public ResponseEntity<?> bounce(@RequestHeader HttpHeaders headers, @RequestBody String body,
+    public ResponseEntity<?> bounce(@RequestHeader HttpHeaders headers, @RequestBody(required = false) String body,
             @NotificationSubject String subject, @NotificationMessage String message) {
         log.info("POST bounce - headers:{} body:{}", headers.toString(), body);
         handleNotification(headers, body);
@@ -44,20 +44,24 @@ public class AwsEmailNotificationController {
     }
 
     @PostMapping("/delivered")
-    public ResponseEntity<?> delivered(@RequestHeader HttpHeaders headers, @RequestBody String body) {
+    public ResponseEntity<?> delivered(@RequestHeader HttpHeaders headers, @RequestBody(required = false) String body) {
+        log.info("POST delivered - headers:{} body:{}", headers.toString(), body);
         handleNotification(headers, body);
         return ResponseEntity.ok().build();
     }
 
     private void handleNotification(HttpHeaders headers, String body) {
-        String headerMessageType = headers.getFirst("x-amz-sns-message-type");
         try {
+            if (body == null) {
+                return;
+            }
+            String headerMessageType = headers.getFirst("x-amz-sns-message-type");
             AwsSnsRequest value = objectMapper.readValue(body, AwsSnsRequest.class);
             AwsSnsVerifierUtils.verify(headerMessageType, value);
             AwsSnsMessageRequest message = objectMapper.readValue(value.message(), AwsSnsMessageRequest.class);
             awsNotificationService.process(message);
         } catch (Exception e) {
-            log.error("delivered - error: ", e);
+            log.error("handleNotification - error: ", e);
         }
     }
 }
