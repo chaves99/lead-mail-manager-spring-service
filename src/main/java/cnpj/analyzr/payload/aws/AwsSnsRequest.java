@@ -1,7 +1,9 @@
 package cnpj.analyzr.payload.aws;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record AwsSnsRequest(
         @JsonProperty("Type") String type,
         @JsonProperty("Token") String token,

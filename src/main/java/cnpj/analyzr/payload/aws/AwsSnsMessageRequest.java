@@ -4,10 +4,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record AwsSnsMessageRequest(AwsSnsNotificationTypeRequest notificationType, AwsSnsMessageMailRequest mail) {
 
     public static record AwsSnsMessageMailRequest(List<String> destination,

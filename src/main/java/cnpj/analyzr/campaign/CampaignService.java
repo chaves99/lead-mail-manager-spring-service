@@ -38,8 +38,6 @@ public class CampaignService {
     private final CampaignRepository campaignRepository;
     private final CampaignRowRepository campaignRowRepository;
 
-    // jakarta.mail.internet.AddressException: Domain ends with dot in string
-    // ``restaurantetoquedesabor12@gmail.''
     @Async("threadPoolTaskExecutor")
     public void execute(CampaignExecuteRecordRequest body) {
         log.info("execute - body:{}", body);
