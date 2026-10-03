@@ -35,7 +35,6 @@ public class AwsEmailNotificationController {
 
     @PostMapping("/bounce")
     public ResponseEntity<?> bounce(@RequestHeader HttpHeaders headers, @RequestBody(required = false) String body) {
-        log.info("POST bounce - headers:{} body:{}", body);
         handleNotification(headers, body);
         return ResponseEntity.ok().build();
     }
