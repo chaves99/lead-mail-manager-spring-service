@@ -12,8 +12,6 @@ import cnpj.analyzr.payload.aws.AwsSnsMessageRequest;
 import cnpj.analyzr.payload.aws.AwsSnsRequest;
 import cnpj.analyzr.service.AwsNotificationService;
 import cnpj.analyzr.utils.AwsSnsVerifierUtils;
-import io.awspring.cloud.sns.annotation.handlers.NotificationMessage;
-import io.awspring.cloud.sns.annotation.handlers.NotificationSubject;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tools.jackson.databind.ObjectMapper;
@@ -36,8 +34,7 @@ public class AwsEmailNotificationController {
     }
 
     @PostMapping("/bounce")
-    public ResponseEntity<?> bounce(@RequestHeader HttpHeaders headers, @RequestBody(required = false) String body,
-            @NotificationSubject String subject, @NotificationMessage String message) {
+    public ResponseEntity<?> bounce(@RequestHeader HttpHeaders headers, @RequestBody(required = false) String body) {
         log.info("POST bounce - headers:{} body:{}", headers.toString(), body);
         handleNotification(headers, body);
         return ResponseEntity.ok().build();
