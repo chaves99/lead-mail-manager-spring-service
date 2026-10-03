@@ -28,14 +28,14 @@ public class AwsEmailNotificationController {
 
     @PostMapping("/complaint")
     public ResponseEntity<?> complain(@RequestHeader HttpHeaders headers, @RequestBody(required = false) String body) {
-        log.info("POST complaint - headers:{} body:{}", headers.toString(), body);
+        log.info("POST complaint - headers:{} body:{}", body);
         handleNotification(headers, body);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/bounce")
     public ResponseEntity<?> bounce(@RequestHeader HttpHeaders headers, @RequestBody(required = false) String body) {
-        log.info("POST bounce - headers:{} body:{}", headers.toString(), body);
+        log.info("POST bounce - headers:{} body:{}", body);
         handleNotification(headers, body);
         return ResponseEntity.ok().build();
     }
@@ -52,11 +52,8 @@ public class AwsEmailNotificationController {
                 return;
             }
             String headerMessageType = headers.getFirst("x-amz-sns-message-type");
-            log.info("handleNotification - headerMessageType:{} body:{}", headerMessageType, body);
             AwsSnsRequest value = objectMapper.readValue(body, AwsSnsRequest.class);
-            log.info("handleNotification - parsed json:{}", value);
             AwsSnsVerifierUtils.verify(headerMessageType, value);
-            log.info("handleNotification - message:{}", value.message());
             AwsSnsMessageRequest message = objectMapper.readValue(value.message(), AwsSnsMessageRequest.class);
             awsNotificationService.process(message);
         } catch (Exception e) {

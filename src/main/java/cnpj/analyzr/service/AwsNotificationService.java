@@ -12,7 +12,6 @@ import cnpj.analyzr.payload.aws.AwsSesHeaderRequest;
 import cnpj.analyzr.payload.aws.AwsSnsMessageRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import tools.jackson.databind.ObjectMapper;
 
 @Service
 @Slf4j
