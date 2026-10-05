@@ -22,7 +22,7 @@ public class CampaignRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-    public List<CampaignRecordResponse> find() {
+    public List<CampaignRecordResponse> find(Long lastId, Integer limit) {
         String sql = """
                 SELECT c.*,
                     COUNT(*) FILTER (WHERE cr.success IS TRUE) as success,
@@ -37,10 +37,17 @@ public class CampaignRepository {
                 LEFT JOIN campaign_row cr
                 ON (c.id = cr.campaign_id)
                 LEFT JOIN template te ON (c.template_id = te.id)
-                GROUP BY c.id, te.id
-                ORDER BY c.id
                 """;
-        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+        if (lastId > 0) {
+            sql += " WHERE c.id < :lastId ";
+        }
+        sql += """
+                GROUP BY c.id, te.id
+                ORDER BY c.id DESC
+                LIMIT :limit
+                """;
+
+        return jdbcTemplate.query(sql, Map.of("lastId", lastId, "limit", limit), (rs, rowNum) -> {
             return CampaignRecordResponse.builder()
                     .id(rs.getLong("id"))
                     .description(rs.getString("description"))

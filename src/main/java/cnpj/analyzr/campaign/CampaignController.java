@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cnpj.analyzr.campaign.entity.req.CampaignExecuteRecordRequest;
@@ -25,8 +26,11 @@ public class CampaignController {
     private final CampaignService campaignService;
 
     @GetMapping
-    public ResponseEntity<List<CampaignRecordResponse>> get() {
-        return ResponseEntity.ok(repository.find());
+    public ResponseEntity<List<CampaignRecordResponse>> get(
+            @RequestParam(required = false, defaultValue = "10") Integer limit,
+            @RequestParam(required = false, defaultValue = "0") Long lastId) {
+        List<CampaignRecordResponse> body = repository.find(lastId, limit);
+        return ResponseEntity.ok(body);
     }
 
     @GetMapping("/{id}")

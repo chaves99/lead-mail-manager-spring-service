@@ -10,12 +10,7 @@ spring:
     driver-class-name: org.postgresql.Driver
 
 owner-email: viniciusbaleia1999@gmail.com
-
-mailgun:
-  url: ${MAILGUN_URL:test}
-  apiKey: ${MAILGUN_APIKEY:test}
-  # email to be the host of the email sent by the service
-  hostFrom: ${MAILGUN_HOST_FROM:ItiMenu <support@itimenu.app>}
+host-from: ${MAILGUN_HOST_FROM:ItiMenu <support@itimenu.app>}
 
 aws:
   region: ${AWS_REGION}

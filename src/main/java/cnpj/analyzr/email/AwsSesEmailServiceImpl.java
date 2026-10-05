@@ -25,7 +25,7 @@ public class AwsSesEmailServiceImpl {
 
     public AwsSesEmailServiceImpl(JavaMailSender javaMailSender,
             @Value("${owner-email}") String ownerEmail,
-            @Value("${mailgun.hostFrom}") String hostFrom) {
+            @Value("${host-from}") String hostFrom) {
         this.javaMailSender = javaMailSender;
         this.hostFrom = hostFrom;
         this.ownerEmail = ownerEmail;
