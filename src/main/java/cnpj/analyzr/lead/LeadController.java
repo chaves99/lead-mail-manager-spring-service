@@ -46,9 +46,9 @@ public class LeadController {
     }
 
     public static record LeadTotalDashboard(Integer registered, Integer sent,
-            Integer opened, Integer clicked, Integer unsubscribed) {
+            Integer opened, Integer clicked, Integer unsubscribed, Integer unreachable) {
         public LeadTotalDashboard withRegistered(Integer registered) {
-            return new LeadTotalDashboard(registered, sent, opened, clicked, unsubscribed);
+            return new LeadTotalDashboard(registered, sent, opened, clicked, unsubscribed, unreachable);
         }
     }
 

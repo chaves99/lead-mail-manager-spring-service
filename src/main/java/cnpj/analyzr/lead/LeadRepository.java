@@ -152,13 +152,14 @@ public class LeadRepository {
                     COUNT(id) AS total,
                     SUM(open) AS open,
                     SUM(click) AS click,
-                    COUNT(*) FILTER (WHERE unsubscribed IS TRUE) as unsubscribed
+                    COUNT(*) FILTER (WHERE unsubscribed IS TRUE) as unsubscribed,
+                    COUNT(*) FILTER (WHERE unreachable IS TRUE) as unreachable
                 FROM lead
                 WHERE send_quantity > 0;
                 """;
         return jdbcTemplate.queryForObject(sql, Map.of(), (rs, rn) -> {
             return new LeadTotalDashboard(null, rs.getInt("total"), rs.getInt("open"), rs.getInt("click"),
-                    rs.getInt("unsubscribed"));
+                    rs.getInt("unsubscribed"), rs.getInt("unreachable"));
         });
     }
 
