@@ -213,6 +213,8 @@ public class LeadRepository {
     private Map<String, Object> buildQuery(LeadFilterRecord filter, StringBuilder query) {
         Map<String, Object> map = new HashMap<>();
 
+        query.append(" AND (unreachable IS FALSE OR unreachable IS NULL) ");
+
         if (filter.emailExclude() != null && !filter.emailExclude().isEmpty()) {
             boolean first = true;
             query.append(" AND (");
