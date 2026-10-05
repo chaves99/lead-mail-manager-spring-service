@@ -7,6 +7,5 @@ import lombok.Builder;
 @Builder
 public record CampaignRecordResponse(Long id, String description,
         Long templateId, String templateName, Integer rowCount,
-        LocalDateTime createdAt, Integer success, Integer failure,
-        Integer pending, Integer delivered, Integer bounced, Integer complained, Integer unknowError) {
+        LocalDateTime createdAt, Integer success, Integer failure) {
 }
