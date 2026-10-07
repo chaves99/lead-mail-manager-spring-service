@@ -29,7 +29,6 @@ public class CsvController {
     }
 
     public static enum FileType {
-        ESTABLISHMENT,
         LEAD,
         COMPANY;
     }

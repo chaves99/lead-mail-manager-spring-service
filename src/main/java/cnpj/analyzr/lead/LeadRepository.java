@@ -166,7 +166,6 @@ public class LeadRepository {
     public int count(LeadFilterRecord filter) {
         StringBuilder sql = new StringBuilder("""
                 SELECT COUNT(DISTINCT l.id) from lead l
-                LEFT JOIN establishment es ON (l.id = es.lead_id)
                 WHERE 1=1
                 """);
 
@@ -178,7 +177,6 @@ public class LeadRepository {
     public List<LeadRecord> find(LeadFilterRecord filter) {
         StringBuilder sql = new StringBuilder("""
                 SELECT l.* from lead l
-                LEFT JOIN establishment es ON (l.id = es.lead_id)
                 WHERE 1=1
                 """);
 
@@ -213,7 +211,8 @@ public class LeadRepository {
     private Map<String, Object> buildQuery(LeadFilterRecord filter, StringBuilder query) {
         Map<String, Object> map = new HashMap<>();
 
-        query.append(" AND (unreachable IS FALSE OR unreachable IS NULL) ");
+        query.append(" AND l.id > ").append(filter.lastIndex()).append(" ");
+        query.append(" AND (l.unreachable IS FALSE OR l.unreachable IS NULL) ");
 
         if (filter.emailExclude() != null && !filter.emailExclude().isEmpty()) {
             boolean first = true;
@@ -246,43 +245,6 @@ public class LeadRepository {
         if (filter.sentQuantity() != null && filter.sentQuantity() >= 0) {
             query.append(" AND l.send_quantity = :quantitySent ");
             map.put("quantitySent", filter.sentQuantity());
-        }
-
-        if (filter.cnae() != null && !filter.cnae().isEmpty()) {
-            int counter = 0;
-            String keyPrefix = "cnae_";
-            for (var cnae : filter.cnae()) {
-                String key = keyPrefix + counter;
-                query.append(" AND es.cnae_tax_primary = :" + key + " ");
-                counter++;
-                map.put(key, cnae.code().toString());
-            }
-        }
-
-        if (filter.fantasyNameExclude() != null && !filter.fantasyNameExclude().isEmpty()) {
-            query.append(" AND (");
-            query.append(" es.fantasy_name <> '' ");
-            for (String name : filter.fantasyNameExclude()) {
-                query.append(" AND es.fantasy_name NOT ILIKE '%").append(name).append("%' ");
-            }
-            query.append(") ");
-        }
-
-        if (filter.fantasyNameInclude() != null && !filter.fantasyNameInclude().isEmpty()) {
-            query.append(" AND (");
-            boolean first = true;
-            for (String token : filter.fantasyNameInclude()) {
-                if (!first)
-                    query.append("OR ");
-                query.append(" es.fantasy_name ILIKE '%").append(token).append("%' ");
-                first = false;
-            }
-            query.append(") ");
-        }
-
-        if (filter.validMotherBranchId()) {
-            query.append(" AND es.mother_branch_identifier = :mother_branch_identifier");
-            map.put("mother_branch_identifier", filter.motherBranchId().toString());
         }
 
         return map;

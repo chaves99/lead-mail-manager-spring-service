@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import cnpj.analyzr.csv.CsvController.FileType;
 import cnpj.analyzr.csv.processor.CsvProcessor;
-import cnpj.analyzr.csv.processor.EstablishmentProcessor;
 import cnpj.analyzr.csv.processor.LeadProcessor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 public class CsvService {
 
     private final LeadProcessor leadProcessor;
-    private final EstablishmentProcessor establishmentProcessor;
 
     @Async
     public void processAsync(FileType fileType, byte[] file) {
@@ -57,9 +55,7 @@ public class CsvService {
     @SuppressWarnings("rawtypes")
     private CsvProcessor getProcessor(FileType fileType) {
         return switch (fileType) {
-            case ESTABLISHMENT -> establishmentProcessor;
             case LEAD -> leadProcessor;
-
             default -> throw new IllegalArgumentException();
         };
     }
