@@ -10,9 +10,7 @@ import java.util.List;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import cnpj.analyzr.csv.CsvController.FileType;
-import cnpj.analyzr.csv.processor.CsvProcessor;
-import cnpj.analyzr.csv.processor.LeadProcessor;
+import cnpj.analyzr.lead.LeadRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,43 +19,27 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class CsvService {
 
-    private final LeadProcessor leadProcessor;
+    private final LeadRepository leadRepository;
 
     @Async
-    public void processAsync(FileType fileType, byte[] file) {
+    public void processAsync(byte[] file) {
         long startTime = System.currentTimeMillis();
         try (InputStream is = new ByteArrayInputStream(file);
                 InputStreamReader reader = new InputStreamReader(is);
                 BufferedReader bufferedReader = new BufferedReader(reader)) {
+            List<String> emails = new ArrayList<>();
             String line;
-            @SuppressWarnings("unchecked")
-            CsvProcessor<Object> processor = getProcessor(fileType);
-            List<Object> bulkObjectList = new ArrayList<>();
-            log.info("processAsync - start to read file type:{} with processor:{}", fileType, processor);
-            int c = 0;
             while ((line = bufferedReader.readLine()) != null) {
-                processor.parse(line.split(";")).ifPresent(bulkObjectList::add);
-                if (bulkObjectList.size() == processor.getBatchSize()) {
-                    log.info("inserting bulk - lines read:{}", String.format("%,d", c));
-                    processor.insertAll(bulkObjectList);
-                    bulkObjectList.clear();
+                if (line != null && !line.isBlank()) {
+                    emails.add(line);
                 }
-                c++;
             }
-            processor.insertAll(bulkObjectList); // inserting remaning
+            leadRepository.insert(emails);
+            log.info("processAsync - inserted {} rows", emails.size());
         } catch (Exception e) {
-            log.error("process - fileType:{} exception:{}", fileType, e.getMessage());
+            log.error("process - exception:{}", e.getMessage());
         }
         long endTime = System.currentTimeMillis();
         log.info("processAsync - processed file in {} seconds", ((endTime - startTime) / 1000));
     }
-
-    @SuppressWarnings("rawtypes")
-    private CsvProcessor getProcessor(FileType fileType) {
-        return switch (fileType) {
-            case LEAD -> leadProcessor;
-            default -> throw new IllegalArgumentException();
-        };
-    }
-
 }
