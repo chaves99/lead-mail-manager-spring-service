@@ -27,6 +27,14 @@ public class LeadService {
         return new LeadResponse(count, body);
     }
 
+    public void create(String email) {
+        leadRepository.insert(List.of(email));
+    }
+
+    public void createBatch(List<String> emails) {
+        leadRepository.insert(emails);
+    }
+
     public LeadTotalDashboard getTotalDashboard() {
         return leadRepository
                 .findTotalDashboard()

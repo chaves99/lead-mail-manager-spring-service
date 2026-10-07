@@ -22,9 +22,27 @@ public class LeadController {
 
     private final LeadService service;
 
-    @PostMapping
+    @PostMapping("/search")
     public ResponseEntity<LeadResponse> fetch(@RequestBody LeadFilterRecord filter) {
         return ResponseEntity.ok(service.fetch(filter));
+    }
+
+    @PostMapping()
+    public ResponseEntity<LeadResponse> add(@RequestBody LeadCreationRequest lead) {
+        if (lead.email() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        service.create(lead.email());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/batch")
+    public ResponseEntity<LeadResponse> addBatch(@RequestBody LeadCreationBatchRequest lead) {
+        if (lead.emails() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+        service.createBatch(lead.emails());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/dashboard")
@@ -53,5 +71,11 @@ public class LeadController {
     }
 
     public static record LeadResponse(Integer total, List<LeadRecord> list) {
+    }
+
+    public static record LeadCreationRequest(String email) {
+    }
+
+    public static record LeadCreationBatchRequest(List<String> emails) {
     }
 }
