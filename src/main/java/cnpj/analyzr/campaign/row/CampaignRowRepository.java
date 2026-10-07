@@ -148,9 +148,14 @@ public class CampaignRowRepository {
         });
     }
 
-    public void deleteAll(Long id) {
+    public void deleteByLead(Long leadId) {
+        String sql = "DELETE FROM campaign_row WHERE lead_id = :id";
+        jdbcTemplate.update(sql, Map.of("id", leadId));
+    }
+
+    public void deleteAll(Long campaignId) {
         String sql = "DELETE FROM campaign_row WHERE campaign_id = :id";
-        jdbcTemplate.update(sql, Map.of("id", id));
+        jdbcTemplate.update(sql, Map.of("id", campaignId));
     }
 
     @Builder

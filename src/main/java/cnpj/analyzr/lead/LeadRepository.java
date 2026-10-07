@@ -25,6 +25,10 @@ public class LeadRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
+
+    public void delete(Long id) {
+        jdbcTemplate.update("DELETE FROM lead WHERE id = :id ", Map.of("id", id));
+    }
     public void insert(List<String> emails) {
         String sql = "INSERT INTO lead(email) VALUES(?) ON CONFLICT(email) DO NOTHING";
 

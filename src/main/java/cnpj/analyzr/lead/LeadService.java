@@ -5,6 +5,7 @@ import java.util.List;
 import org.jsoup.HttpStatusException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import cnpj.analyzr.campaign.row.CampaignRow;
 import cnpj.analyzr.campaign.row.CampaignRowRepository;
@@ -19,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class LeadService {
 
     private final LeadRepository leadRepository;
-    private final CampaignRowRepository campaignRowRepository;;
+    private final CampaignRowRepository campaignRowRepository;
 
     public LeadResponse fetch(LeadFilterRecord filter) {
         List<LeadRecord> body = leadRepository.find(filter);
@@ -48,6 +49,12 @@ public class LeadService {
                 .orElseThrow(() -> new HttpStatusException("", HttpStatus.NOT_FOUND.value(), null));
         log.info("unsubscribe - leadId:{} rowId:{}", leadId, rowId);
         leadRepository.unsubscribe(campaignRow.leadId());
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        campaignRowRepository.deleteByLead(id);
+        leadRepository.delete(id);
     }
 
 }
