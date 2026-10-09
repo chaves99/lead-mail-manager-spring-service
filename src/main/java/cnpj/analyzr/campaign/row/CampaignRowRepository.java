@@ -16,6 +16,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
+import cnpj.analyzr.payload.DashboardStatusRecord.EmailStatus;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,30 @@ public class CampaignRowRepository {
             log.error("find id:{} exception: ", id, e);
             return Optional.empty();
         }
+    }
+
+    public EmailStatus findStatusCounting() {
+        String sql = """
+                SELECT
+                    COUNT(cr.id) AS total,
+                    COUNT(cr.id) FILTER (WHERE cr.status = 1) AS pending,
+                    COUNT(cr.id) FILTER (WHERE cr.status = 2) AS success,
+                    COUNT(cr.id) FILTER (WHERE cr.status > 2) AS error,
+                    COUNT(cr.id) FILTER (WHERE cr.clicked IS TRUE) AS click,
+                    COUNT(cr.id) FILTER (WHERE cr.opened IS TRUE) AS opened
+                FROM campaign_row cr;
+                """;
+
+        return jdbcTemplate.queryForObject(sql, Map.of(), (rs, rn) -> {
+            return EmailStatus.builder()
+                    .total(rs.getLong("total"))
+                    .pending(rs.getLong("pending"))
+                    .success(rs.getLong("success"))
+                    .error(rs.getLong("error"))
+                    .clicked(rs.getLong("click"))
+                    .opened(rs.getLong("opened"))
+                    .build();
+        });
     }
 
     public Optional<CampaignRow> findByIdAndLeadId(Long id, Long leadId) {

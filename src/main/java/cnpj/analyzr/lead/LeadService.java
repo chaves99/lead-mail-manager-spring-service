@@ -10,7 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import cnpj.analyzr.campaign.row.CampaignRow;
 import cnpj.analyzr.campaign.row.CampaignRowRepository;
 import cnpj.analyzr.lead.LeadController.LeadResponse;
-import cnpj.analyzr.lead.LeadController.LeadTotalDashboard;
+import cnpj.analyzr.payload.DashboardStatusRecord;
+import cnpj.analyzr.payload.DashboardStatusRecord.EmailStatus;
+import cnpj.analyzr.payload.DashboardStatusRecord.LeadTotal;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -36,10 +38,15 @@ public class LeadService {
         leadRepository.insert(emails);
     }
 
-    public LeadTotalDashboard getTotalDashboard() {
-        return leadRepository
+    public DashboardStatusRecord getTotalDashboard() {
+        LeadTotal leads = leadRepository
                 .findTotalDashboard()
                 .withRegistered(leadRepository.countNoFilter());
+        EmailStatus emails = campaignRowRepository.findStatusCounting();
+        return DashboardStatusRecord.builder()
+                .leads(leads)
+                .emails(emails)
+                .build();
 
     }
 

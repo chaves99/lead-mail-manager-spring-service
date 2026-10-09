@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import cnpj.analyzr.payload.DashboardStatusRecord;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,7 +31,7 @@ public class LeadController {
         return ResponseEntity.ok(service.fetch(filter));
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<LeadResponse> add(@RequestBody LeadCreationRequest lead) {
         if (lead.email() == null) {
             return ResponseEntity.badRequest().build();
@@ -49,7 +50,7 @@ public class LeadController {
     }
 
     @GetMapping("/dashboard")
-    public ResponseEntity<LeadTotalDashboard> getTotalDashboard() {
+    public ResponseEntity<DashboardStatusRecord> getTotalDashboard() {
         return ResponseEntity.ok(service.getTotalDashboard());
     }
 
@@ -70,19 +71,12 @@ public class LeadController {
     public ResponseEntity<?> delete(@PathVariable Long id) {
         try {
             service.delete(id);
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             log.error("delete - exception: ", e);
             return ResponseEntity.internalServerError().build();
         }
         return ResponseEntity.ok().build();
-    }
-
-    public static record LeadTotalDashboard(Integer registered, Integer sent,
-            Integer opened, Integer clicked, Integer unsubscribed, Integer unreachable) {
-        public LeadTotalDashboard withRegistered(Integer registered) {
-            return new LeadTotalDashboard(registered, sent, opened, clicked, unsubscribed, unreachable);
-        }
     }
 
     public static record LeadResponse(Integer total, List<LeadRecord> list) {

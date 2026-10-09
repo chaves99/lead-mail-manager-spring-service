@@ -14,7 +14,7 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import cnpj.analyzr.lead.LeadController.LeadTotalDashboard;
+import cnpj.analyzr.payload.DashboardStatusRecord.LeadTotal;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,10 +25,10 @@ public class LeadRepository {
 
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
-
     public void delete(Long id) {
         jdbcTemplate.update("DELETE FROM lead WHERE id = :id ", Map.of("id", id));
     }
+
     public void insert(List<String> emails) {
         String sql = "INSERT INTO lead(email) VALUES(?) ON CONFLICT(email) DO NOTHING";
 
@@ -150,20 +150,30 @@ public class LeadRepository {
         return jdbcTemplate.queryForObject(sql.toString(), Map.of(), Integer.class);
     }
 
-    public LeadTotalDashboard findTotalDashboard() {
+    public LeadTotal findTotalDashboard() {
         String sql = """
                 SELECT
                     COUNT(id) AS total,
-                    SUM(open) AS open,
-                    SUM(click) AS click,
+                    COUNT(send_quantity) FILTER (WHERE send_quantity > 0) AS leads_emailed,
+                    SUM(open) AS total_open,
+                    SUM(click) AS total_click,
+                    COUNT(open) FILTER (WHERE open > 0) AS leads_opened,
+                    COUNT(click) FILTER (WHERE click > 0) AS leads_clicked,
                     COUNT(*) FILTER (WHERE unsubscribed IS TRUE) as unsubscribed,
-                    COUNT(*) FILTER (WHERE unreachable IS TRUE) as unreachable
-                FROM lead
-                WHERE send_quantity > 0;
+                    COUNT(*) FILTER (WHERE unreachable IS TRUE) as unreachable -- total lead unreachable
+                FROM lead;
                 """;
         return jdbcTemplate.queryForObject(sql, Map.of(), (rs, rn) -> {
-            return new LeadTotalDashboard(null, rs.getInt("total"), rs.getInt("open"), rs.getInt("click"),
-                    rs.getInt("unsubscribed"), rs.getInt("unreachable"));
+            return LeadTotal.builder()
+                    .totalLeads(rs.getInt("total"))
+                    .emailed(rs.getInt("leads_emailed"))
+                    .totalOpened(rs.getInt("total_open"))
+                    .totalClicked(rs.getInt("total_click"))
+                    .leadsOpened(rs.getInt("leads_opened"))
+                    .leadsClicked(rs.getInt("leads_clicked"))
+                    .unsubscribed(rs.getInt("unsubscribed"))
+                    .unreachable(rs.getInt("unreachable"))
+                    .build();
         });
     }
 
