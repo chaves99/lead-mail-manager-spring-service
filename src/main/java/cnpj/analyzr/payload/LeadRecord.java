@@ -1,4 +1,4 @@
-package cnpj.analyzr.lead;
+package cnpj.analyzr.payload;
 
 import java.time.LocalDate;
 

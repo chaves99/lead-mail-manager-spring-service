@@ -7,7 +7,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import cnpj.analyzr.lead.LeadRecord;
+import cnpj.analyzr.payload.LeadRecord;
 import cnpj.analyzr.payload.aws.AwsSesHeaderRequest;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

@@ -6,8 +6,8 @@ import org.springframework.stereotype.Service;
 
 import cnpj.analyzr.campaign.row.CampaignRow;
 import cnpj.analyzr.campaign.row.CampaignRowRepository;
-import cnpj.analyzr.lead.LeadRecord;
-import cnpj.analyzr.lead.LeadRepository;
+import cnpj.analyzr.payload.LeadRecord;
+import cnpj.analyzr.repository.LeadRepository;
 import cnpj.analyzr.payload.aws.AwsSesHeaderRequest;
 import cnpj.analyzr.payload.aws.AwsSnsMessageRequest;
 import lombok.RequiredArgsConstructor;

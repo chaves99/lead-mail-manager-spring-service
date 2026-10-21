@@ -6,7 +6,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import cnpj.analyzr.lead.LeadRecord;
+import cnpj.analyzr.payload.LeadRecord;
 
 public record EmailUtils() {
 

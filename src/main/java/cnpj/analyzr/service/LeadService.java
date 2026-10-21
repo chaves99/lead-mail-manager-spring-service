@@ -1,4 +1,4 @@
-package cnpj.analyzr.lead;
+package cnpj.analyzr.service;
 
 import java.util.List;
 
@@ -9,10 +9,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cnpj.analyzr.campaign.row.CampaignRow;
 import cnpj.analyzr.campaign.row.CampaignRowRepository;
-import cnpj.analyzr.lead.LeadController.LeadResponse;
+import cnpj.analyzr.controller.LeadController.LeadResponse;
 import cnpj.analyzr.payload.DashboardStatusRecord;
 import cnpj.analyzr.payload.DashboardStatusRecord.EmailStatus;
 import cnpj.analyzr.payload.DashboardStatusRecord.LeadTotal;
+import cnpj.analyzr.payload.LeadFilterRecord;
+import cnpj.analyzr.payload.LeadRecord;
+import cnpj.analyzr.repository.LeadRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,6 +28,7 @@ public class LeadService {
     private final CampaignRowRepository campaignRowRepository;
 
     public LeadResponse fetch(LeadFilterRecord filter) {
+        System.out.println("-> filter: " + filter);
         List<LeadRecord> body = leadRepository.find(filter);
         int count = leadRepository.count(filter);
         return new LeadResponse(count, body);
@@ -47,7 +51,6 @@ public class LeadService {
                 .leads(leads)
                 .emails(emails)
                 .build();
-
     }
 
     public void unsubscribe(Long leadId, Long rowId) throws HttpStatusException {

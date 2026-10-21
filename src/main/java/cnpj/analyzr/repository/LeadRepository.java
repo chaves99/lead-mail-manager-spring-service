@@ -1,5 +1,5 @@
 
-package cnpj.analyzr.lead;
+package cnpj.analyzr.repository;
 
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -15,6 +15,8 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import cnpj.analyzr.payload.DashboardStatusRecord.LeadTotal;
+import cnpj.analyzr.payload.LeadFilterRecord;
+import cnpj.analyzr.payload.LeadRecord;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -189,6 +191,7 @@ public class LeadRepository {
     }
 
     public List<LeadRecord> find(LeadFilterRecord filter) {
+        log.info(" filter: " + filter);
         StringBuilder sql = new StringBuilder("""
                 SELECT l.* from lead l
                 WHERE 1=1
@@ -225,6 +228,7 @@ public class LeadRepository {
     private Map<String, Object> buildQuery(LeadFilterRecord filter, StringBuilder query) {
         Map<String, Object> map = new HashMap<>();
 
+        // REMOVING UNREACHABLE LEADS
         query.append(" AND l.id > ").append(filter.lastIndex()).append(" ");
         query.append(" AND (l.unreachable IS FALSE OR l.unreachable IS NULL) ");
 
@@ -259,6 +263,10 @@ public class LeadRepository {
         if (filter.sentQuantity() != null && filter.sentQuantity() >= 0) {
             query.append(" AND l.send_quantity = :quantitySent ");
             map.put("quantitySent", filter.sentQuantity());
+        }
+
+        if (filter.emailOpened() != null && filter.emailOpened().booleanValue()) {
+            query.append(" AND l.open > 0 ");
         }
 
         return map;

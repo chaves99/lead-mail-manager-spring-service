@@ -1,4 +1,4 @@
-package cnpj.analyzr.lead;
+package cnpj.analyzr.controller;
 
 import java.net.URI;
 import java.util.List;
@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import cnpj.analyzr.payload.DashboardStatusRecord;
+import cnpj.analyzr.payload.LeadFilterRecord;
+import cnpj.analyzr.payload.LeadRecord;
+import cnpj.analyzr.service.LeadService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 

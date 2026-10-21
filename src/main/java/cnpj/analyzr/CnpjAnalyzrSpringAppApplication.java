@@ -22,7 +22,8 @@ public class CnpjAnalyzrSpringAppApplication {
             long totalMemory = DataSize.ofBytes(Runtime.getRuntime().totalMemory()).toGigabytes();
             long maxMemory = DataSize.ofBytes(Runtime.getRuntime().maxMemory()).toGigabytes();
             long freeMemory = DataSize.ofBytes(Runtime.getRuntime().freeMemory()).toGigabytes();
-            log.info("runner - totalMemory:{}G maxMemory:{}G freeMemory:{}G", totalMemory, maxMemory, freeMemory);
+            System.out.println("----> runner: total memory: " + totalMemory);
+            // log.info("runner - totalMemory:{}G maxMemory:{}G freeMemory:{}G", totalMemory, maxMemory, freeMemory);
         };
     }
 

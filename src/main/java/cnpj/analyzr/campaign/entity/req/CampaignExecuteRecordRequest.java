@@ -1,6 +1,6 @@
 package cnpj.analyzr.campaign.entity.req;
 
-import cnpj.analyzr.lead.LeadFilterRecord;
+import cnpj.analyzr.payload.LeadFilterRecord;
 
 public record CampaignExecuteRecordRequest(String description,
         Long templateId,

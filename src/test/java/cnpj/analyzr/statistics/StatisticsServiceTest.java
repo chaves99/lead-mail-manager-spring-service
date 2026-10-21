@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import cnpj.analyzr.campaign.row.CampaignRow;
 import cnpj.analyzr.campaign.row.CampaignRowRepository;
-import cnpj.analyzr.lead.LeadRepository;
+import cnpj.analyzr.repository.LeadRepository;
 
 @ExtendWith(MockitoExtension.class)
 public class StatisticsServiceTest {
