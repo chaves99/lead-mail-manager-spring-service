@@ -222,6 +222,7 @@ public class LeadRepository {
     private LeadRecord buildFromResultSet(ResultSet rs) throws SQLException {
         return LeadRecord.builder()
                 .id(rs.getLong("id"))
+                .name(rs.getString("name"))
                 .email(rs.getString("email"))
                 .send(rs.getInt("send_quantity"))
                 .build();
@@ -237,9 +238,9 @@ public class LeadRepository {
         if (filter.names() != null && !filter.names().isEmpty()) {
             boolean first = true;
             query.append(" AND (");
-            for (String token : filter.emailExclude()) {
+            for (String token : filter.names()) {
                 if (!first)
-                    query.append(" AND ");
+                    query.append(" OR ");
                 query.append(" l.name ILIKE '%").append(token).append("%' ");
                 first = false;
             }
@@ -286,3 +287,12 @@ public class LeadRepository {
         return map;
     }
 }
+
+
+
+// SELECT l.* from lead l
+// WHERE 1=1
+//  AND l.id > 0
+//  AND (l.unreachable IS FALSE OR l.unreachable IS NULL) 
+//  AND () 
+//  AND l.unsubscribed IS FALSE GROUP BY l.id ORDER BY l.id  LIMIT ?
