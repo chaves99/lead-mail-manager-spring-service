@@ -39,6 +39,7 @@ public class LeadService {
     }
 
     public void createBatch(List<LeadCreationRequest> emails) {
+        log.info("createBatch - leads:{}", emails.size());
         leadRepository.insert(emails);
     }
 
