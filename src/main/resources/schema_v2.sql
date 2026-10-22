@@ -3,6 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS lead(
     id SERIAL PRIMARY KEY,
+    name VARCHAR(200),
     email VARCHAR(100) UNIQUE,
     send_quantity INT NOT NULL DEFAULT 0,
     last_send DATE,
@@ -44,3 +45,4 @@ CREATE TABLE IF NOT EXISTS campaign_row(
 );
 CREATE INDEX campaign_row_index ON campaign_row(id);
 
+ 

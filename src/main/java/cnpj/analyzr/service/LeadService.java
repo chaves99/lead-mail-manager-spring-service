@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import cnpj.analyzr.campaign.row.CampaignRow;
 import cnpj.analyzr.campaign.row.CampaignRowRepository;
+import cnpj.analyzr.controller.LeadController.LeadCreationRequest;
 import cnpj.analyzr.controller.LeadController.LeadResponse;
 import cnpj.analyzr.payload.DashboardStatusRecord;
 import cnpj.analyzr.payload.DashboardStatusRecord.EmailStatus;
@@ -28,17 +29,16 @@ public class LeadService {
     private final CampaignRowRepository campaignRowRepository;
 
     public LeadResponse fetch(LeadFilterRecord filter) {
-        System.out.println("-> filter: " + filter);
         List<LeadRecord> body = leadRepository.find(filter);
         int count = leadRepository.count(filter);
         return new LeadResponse(count, body);
     }
 
-    public void create(String email) {
+    public void create(LeadCreationRequest email) {
         leadRepository.insert(List.of(email));
     }
 
-    public void createBatch(List<String> emails) {
+    public void createBatch(List<LeadCreationRequest> emails) {
         leadRepository.insert(emails);
     }
 

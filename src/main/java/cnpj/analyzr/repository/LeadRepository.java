@@ -14,6 +14,7 @@ import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import cnpj.analyzr.controller.LeadController.LeadCreationRequest;
 import cnpj.analyzr.payload.DashboardStatusRecord.LeadTotal;
 import cnpj.analyzr.payload.LeadFilterRecord;
 import cnpj.analyzr.payload.LeadRecord;
@@ -31,11 +32,12 @@ public class LeadRepository {
         jdbcTemplate.update("DELETE FROM lead WHERE id = :id ", Map.of("id", id));
     }
 
-    public void insert(List<String> emails) {
-        String sql = "INSERT INTO lead(email) VALUES(?) ON CONFLICT(email) DO NOTHING";
+    public void insert(List<LeadCreationRequest> emails) {
+        String sql = "INSERT INTO lead(name, email) VALUES(?, ?) ON CONFLICT(email) DO NOTHING";
 
         jdbcTemplate.getJdbcTemplate().batchUpdate(sql, emails, emails.size(), (ps, arg) -> {
-            ps.setString(1, arg);
+            ps.setString(1, arg.name());
+            ps.setString(2, arg.email());
         });
     }
 
@@ -231,6 +233,18 @@ public class LeadRepository {
         // REMOVING UNREACHABLE LEADS
         query.append(" AND l.id > ").append(filter.lastIndex()).append(" ");
         query.append(" AND (l.unreachable IS FALSE OR l.unreachable IS NULL) ");
+
+        if (filter.names() != null && !filter.names().isEmpty()) {
+            boolean first = true;
+            query.append(" AND (");
+            for (String token : filter.emailExclude()) {
+                if (!first)
+                    query.append(" AND ");
+                query.append(" l.name ILIKE '%").append(token).append("%' ");
+                first = false;
+            }
+            query.append(") ");
+        }
 
         if (filter.emailExclude() != null && !filter.emailExclude().isEmpty()) {
             boolean first = true;

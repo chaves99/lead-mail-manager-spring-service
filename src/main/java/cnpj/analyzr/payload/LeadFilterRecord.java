@@ -7,13 +7,14 @@ public record LeadFilterRecord(
         Integer sentQuantity,
         List<String> emailExclude,
         List<String> emailInclude,
+        List<String> names,
         Long lastIndex,
         Boolean shouldFetchUnsubscribed,
         Boolean emailOpened) {
 
     public LeadFilterRecord withLimit(int pageSize) {
         return new LeadFilterRecord(pageSize, sentQuantity,
-                emailExclude, emailInclude, lastIndex, shouldFetchUnsubscribed,
-                emailOpened);
+                emailExclude, emailInclude, names, lastIndex,
+                shouldFetchUnsubscribed, emailOpened);
     }
 }

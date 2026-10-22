@@ -6,6 +6,7 @@ import lombok.Builder;
 
 @Builder
 public record LeadRecord(Long id,
+        String name,
         String email,
         Integer send,
         LocalDate lastSend,

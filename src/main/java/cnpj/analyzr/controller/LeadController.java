@@ -39,16 +39,16 @@ public class LeadController {
         if (lead.email() == null) {
             return ResponseEntity.badRequest().build();
         }
-        service.create(lead.email());
+        service.create(lead);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/batch")
-    public ResponseEntity<LeadResponse> addBatch(@RequestBody LeadCreationBatchRequest lead) {
-        if (lead.emails() == null) {
+    public ResponseEntity<LeadResponse> addBatch(@RequestBody List<LeadCreationRequest> leads) {
+        if (leads == null) {
             return ResponseEntity.badRequest().build();
         }
-        service.createBatch(lead.emails());
+        service.createBatch(leads);
         return ResponseEntity.noContent().build();
     }
 
@@ -85,9 +85,9 @@ public class LeadController {
     public static record LeadResponse(Integer total, List<LeadRecord> list) {
     }
 
-    public static record LeadCreationRequest(String email) {
+    public static record LeadCreationRequest(String name, String email) {
     }
 
-    public static record LeadCreationBatchRequest(List<String> emails) {
+    public static record LeadCreationBatchRequest(List<LeadCreationRequest> emails) {
     }
 }

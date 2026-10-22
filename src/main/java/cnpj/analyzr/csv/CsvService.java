@@ -10,6 +10,7 @@ import java.util.List;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import cnpj.analyzr.controller.LeadController.LeadCreationRequest;
 import cnpj.analyzr.repository.LeadRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,11 +28,12 @@ public class CsvService {
         try (InputStream is = new ByteArrayInputStream(file);
                 InputStreamReader reader = new InputStreamReader(is);
                 BufferedReader bufferedReader = new BufferedReader(reader)) {
-            List<String> emails = new ArrayList<>();
+            List<LeadCreationRequest> emails = new ArrayList<>();
             String line;
             while ((line = bufferedReader.readLine()) != null) {
                 if (line != null && !line.isBlank()) {
-                    emails.add(line);
+                    String[] split = line.split(";");
+                    emails.add(new LeadCreationRequest(split[0], split[1]));
                 }
             }
             leadRepository.insert(emails);
