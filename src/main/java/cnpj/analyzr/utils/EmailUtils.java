@@ -7,7 +7,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import cnpj.analyzr.payload.LeadRecord;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public record EmailUtils() {
 
     private static final String UNSUBSCRIBE_ELEMENT = """
@@ -21,29 +23,42 @@ public record EmailUtils() {
     private static final String CAMPAIGN_ROW_ID_REPLACABLE_TOKEN = "ROW_ID";
     private static final String URL_TARGET_REPLACABLE_TOKEN = "URL_TARGET";
 
-    private static final String CLICK_TRACKABLE_URL_PARAMS = "?campaign_row_id=" + CAMPAIGN_ROW_ID_REPLACABLE_TOKEN + "&url_target=" + URL_TARGET_REPLACABLE_TOKEN;
-    private static final String CLICK_TRACKABLE_URL = "https://lead-mail-manager-spring-service-production.up.railway.app/statistics/track-click" + CLICK_TRACKABLE_URL_PARAMS;
+    private static final String CLICK_TRACKABLE_URL_PARAMS = "?campaign_row_id=" + CAMPAIGN_ROW_ID_REPLACABLE_TOKEN
+            + "&url_target=" + URL_TARGET_REPLACABLE_TOKEN;
+    private static final String CLICK_TRACKABLE_URL = "https://lead-mail-manager-spring-service-production.up.railway.app/statistics/track-click"
+            + CLICK_TRACKABLE_URL_PARAMS;
 
-    private static final String IMG_OPEN_EMAIL_TRACK = "<img src=\"https://lead-mail-manager-spring-service-production.up.railway.app/statistics/track-open?campaign_row_id=" + CAMPAIGN_ROW_ID_REPLACABLE_TOKEN + "\" width=\"1\" height=\"1\" alt=\"\" />";
+    private static final String IMG_OPEN_EMAIL_TRACK = "<img src=\"https://lead-mail-manager-spring-service-production.up.railway.app/statistics/track-open?campaign_row_id="
+            + CAMPAIGN_ROW_ID_REPLACABLE_TOKEN + "\" width=\"1\" height=\"1\" alt=\"\" />";
 
     public static final String LEAD_NAME_TOKEN = "_LEAD_NAME_";
 
-    public static String prepareEmailBody(LeadRecord lead, Long rowId, String emailBody) {
+    public static String prepareEmailBody(LeadRecord lead, Long rowId, String emailBody)
+            throws EmailOperationException {
         emailBody = replaceLeadValues(lead, emailBody);
-        Document document = Jsoup.parse(emailBody);
-        Element htmlElement = document.select("body").first();
-        htmlElement.append(IMG_OPEN_EMAIL_TRACK.replace(CAMPAIGN_ROW_ID_REPLACABLE_TOKEN, rowId.toString()));
+        try {
+            Document document = Jsoup.parse(emailBody);
+            Element htmlElement = document.select("body").first();
+            htmlElement.append(IMG_OPEN_EMAIL_TRACK.replace(CAMPAIGN_ROW_ID_REPLACABLE_TOKEN, rowId.toString()));
 
-        findLinks(document, rowId);
-        addUnsubscribeLink(document, lead.id(), rowId);
-        return document.toString();
+            findLinks(document, rowId);
+            addUnsubscribeLink(document, lead.id(), rowId);
+            return document.toString();
+        } catch (Exception e) {
+            throw new EmailOperationException(e.getMessage(), lead.email());
+        }
     }
 
-    public static String replaceLeadValues(LeadRecord lead, String emailBody) {
-        if (emailBody.contains(LEAD_NAME_TOKEN)) {
-            emailBody = emailBody.replaceAll(LEAD_NAME_TOKEN, lead.name());
+    public static String replaceLeadValues(LeadRecord lead, String emailBody)
+            throws EmailOperationException {
+        try {
+            if (emailBody.contains(LEAD_NAME_TOKEN)) {
+                emailBody = emailBody.replaceAll(LEAD_NAME_TOKEN, lead.name());
+            }
+            return emailBody;
+        } catch (Exception e) {
+            throw new EmailOperationException(e.getMessage(), lead.email());
         }
-        return emailBody;
     }
 
     private static void addUnsubscribeLink(Document document, Long leadId, Long rowId) {
@@ -61,5 +76,14 @@ public record EmailUtils() {
                     .replace(URL_TARGET_REPLACABLE_TOKEN, value);
             e.attribute("href").setValue(finalTrackableUrl);
         });
+    }
+
+    public static class EmailOperationException extends Exception {
+        private final String email;
+
+        public EmailOperationException(String message, String email) {
+            super(message);
+            this.email = email;
+        }
     }
 }

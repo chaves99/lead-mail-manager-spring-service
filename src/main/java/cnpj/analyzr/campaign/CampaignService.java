@@ -22,6 +22,7 @@ import cnpj.analyzr.repository.LeadRepository;
 import cnpj.analyzr.template.Template;
 import cnpj.analyzr.template.TemplateRepository;
 import cnpj.analyzr.utils.EmailUtils;
+import cnpj.analyzr.utils.EmailUtils.EmailOperationException;
 import jakarta.mail.internet.AddressException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -74,6 +75,8 @@ public class CampaignService {
                 } catch (AddressException e) {
                     log.warn("execute - AddressException:{} email:{}", e.getMessage(), lead.email());
                     leadRepository.unsubscribe(lead.id());
+                } catch (EmailOperationException e) {
+                    log.error("execute - lead:{} EmailOperationException: ", lead, e);
                 }
             }
 
