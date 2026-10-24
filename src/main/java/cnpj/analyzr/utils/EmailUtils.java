@@ -26,7 +26,10 @@ public record EmailUtils() {
 
     private static final String IMG_OPEN_EMAIL_TRACK = "<img src=\"https://lead-mail-manager-spring-service-production.up.railway.app/statistics/track-open?campaign_row_id=" + CAMPAIGN_ROW_ID_REPLACABLE_TOKEN + "\" width=\"1\" height=\"1\" alt=\"\" />";
 
+    public static final String LEAD_NAME_TOKEN = "_LEAD_NAME_";
+
     public static String prepareEmailBody(LeadRecord lead, Long rowId, String emailBody) {
+        emailBody = replaceLeadValues(lead, emailBody);
         Document document = Jsoup.parse(emailBody);
         Element htmlElement = document.select("body").first();
         htmlElement.append(IMG_OPEN_EMAIL_TRACK.replace(CAMPAIGN_ROW_ID_REPLACABLE_TOKEN, rowId.toString()));
@@ -36,6 +39,12 @@ public record EmailUtils() {
         return document.toString();
     }
 
+    public static String replaceLeadValues(LeadRecord lead, String emailBody) {
+        if (emailBody.contains(LEAD_NAME_TOKEN)) {
+            emailBody = emailBody.replaceAll(LEAD_NAME_TOKEN, lead.name());
+        }
+        return emailBody;
+    }
 
     private static void addUnsubscribeLink(Document document, Long leadId, Long rowId) {
         Elements htmls = document.select("body");

@@ -33,11 +33,15 @@ public class LeadRepository {
     }
 
     public void insert(List<LeadCreationRequest> emails) {
-        String sql = "INSERT INTO lead(name, email) VALUES(?, ?) ON CONFLICT(email) DO NOTHING";
+        String sql = """
+                INSERT INTO lead(name, email) VALUES(?, ?) ON CONFLICT(email)
+                DO UPDATE SET name = ?
+                """;
 
         jdbcTemplate.getJdbcTemplate().batchUpdate(sql, emails, emails.size(), (ps, arg) -> {
             ps.setString(1, arg.name());
             ps.setString(2, arg.email());
+            ps.setString(3, arg.name());
         });
     }
 
@@ -235,7 +239,9 @@ public class LeadRepository {
         query.append(" AND l.id > ").append(filter.lastIndex()).append(" ");
         query.append(" AND (l.unreachable IS FALSE OR l.unreachable IS NULL) ");
 
-        if (filter.names() != null && !filter.names().isEmpty()) {
+        if (filter.nameNotNull() != null && filter.nameNotNull()) {
+            query.append(" AND l.name IS NOT NULL ");
+        } else if (filter.names() != null && !filter.names().isEmpty()) {
             boolean first = true;
             query.append(" AND (");
             for (String token : filter.names()) {
@@ -288,11 +294,3 @@ public class LeadRepository {
     }
 }
 
-
-
-// SELECT l.* from lead l
-// WHERE 1=1
-//  AND l.id > 0
-//  AND (l.unreachable IS FALSE OR l.unreachable IS NULL) 
-//  AND () 
-//  AND l.unsubscribed IS FALSE GROUP BY l.id ORDER BY l.id  LIMIT ?

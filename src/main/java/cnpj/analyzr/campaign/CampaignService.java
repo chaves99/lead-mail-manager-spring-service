@@ -63,7 +63,8 @@ public class CampaignService {
                 String emailBody = EmailUtils.prepareEmailBody(lead, rowId, template.body());
 
                 try {
-                    awsSesEmailServiceImpl.send(lead, template.subject(), emailBody,
+                    String subject = EmailUtils.replaceLeadValues(lead, template.subject());
+                    awsSesEmailServiceImpl.send(lead, subject, emailBody,
                             new AwsSesHeaderRequest(rowId));
 
                     campaignRowRepository.updateEmailStatus(rowId, CampaignRow.Status.PENDING);
