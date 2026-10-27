@@ -153,7 +153,7 @@ public class LeadRepository {
         jdbcTemplate.update(sql, Map.of("send_quantity", sendQuantity, "id", id));
     }
 
-    public int countNoFilter() {
+    public int countTotalLeads() {
         String sql = "SELECT COUNT(*) FROM lead";
         return jdbcTemplate.queryForObject(sql.toString(), Map.of(), Integer.class);
     }

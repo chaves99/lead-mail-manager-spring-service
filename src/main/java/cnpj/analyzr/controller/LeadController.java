@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cnpj.analyzr.payload.DashboardStatusRecord;
@@ -53,8 +54,9 @@ public class LeadController {
     }
 
     @GetMapping("/dashboard")
-    public ResponseEntity<DashboardStatusRecord> getTotalDashboard() {
-        return ResponseEntity.ok(service.getTotalDashboard());
+    public ResponseEntity<DashboardStatusRecord> getTotalDashboard(
+            @RequestParam(name = "templateId", required = false) Long templateId) {
+        return ResponseEntity.ok(service.getTotalDashboard(templateId));
     }
 
     @GetMapping("/unsubscribe/{leadId}/{rowId}")

@@ -43,11 +43,11 @@ public class LeadService {
         leadRepository.insert(emails);
     }
 
-    public DashboardStatusRecord getTotalDashboard() {
+    public DashboardStatusRecord getTotalDashboard(Long templateId) {
         LeadTotal leads = leadRepository
                 .findTotalDashboard()
-                .withRegistered(leadRepository.countNoFilter());
-        EmailStatus emails = campaignRowRepository.findStatusCounting();
+                .withRegistered(leadRepository.countTotalLeads());
+        EmailStatus emails = campaignRowRepository.countMetrics(templateId);
         return DashboardStatusRecord.builder()
                 .leads(leads)
                 .emails(emails)

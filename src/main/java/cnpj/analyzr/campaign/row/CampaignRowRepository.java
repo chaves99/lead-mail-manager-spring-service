@@ -40,7 +40,7 @@ public class CampaignRowRepository {
         }
     }
 
-    public EmailStatus findStatusCounting() {
+    public EmailStatus countMetrics(Long templateId) {
         String sql = """
                 SELECT
                     COUNT(cr.id) AS total,
@@ -49,10 +49,19 @@ public class CampaignRowRepository {
                     COUNT(cr.id) FILTER (WHERE cr.status > 2) AS error,
                     COUNT(cr.id) FILTER (WHERE cr.clicked IS TRUE) AS click,
                     COUNT(cr.id) FILTER (WHERE cr.opened IS TRUE) AS opened
-                FROM campaign_row cr;
+                FROM campaign_row cr
                 """;
 
-        return jdbcTemplate.queryForObject(sql, Map.of(), (rs, rn) -> {
+        Map<String, Object> map = new HashMap<>();
+        if (templateId != null && templateId > 0) {
+            sql += """
+                    JOIN campaign c ON (cr.campaign_id = c.id)
+                    WHERE c.template_id = :templateId
+                    """;
+            map.put("templateId", templateId);
+        }
+
+        return jdbcTemplate.queryForObject(sql, map, (rs, rn) -> {
             return EmailStatus.builder()
                     .total(rs.getLong("total"))
                     .pending(rs.getLong("pending"))

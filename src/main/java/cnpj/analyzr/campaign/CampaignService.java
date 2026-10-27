@@ -61,9 +61,9 @@ public class CampaignService {
             for (LeadRecord lead : leads) {
                 long rowId = campaignRowRepository.insertRow(campaignId, lead.id());
 
-                String emailBody = EmailUtils.prepareEmailBody(lead, rowId, template.body());
-
                 try {
+                    String emailBody = EmailUtils.prepareEmailBody(lead, rowId, template.body());
+
                     String subject = EmailUtils.replaceLeadValues(lead, template.subject());
                     awsSesEmailServiceImpl.send(lead, subject, emailBody,
                             new AwsSesHeaderRequest(rowId));
