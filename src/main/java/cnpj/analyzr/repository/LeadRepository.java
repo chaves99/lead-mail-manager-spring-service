@@ -197,7 +197,6 @@ public class LeadRepository {
     }
 
     public List<LeadRecord> find(LeadFilterRecord filter) {
-        log.info(" filter: " + filter);
         StringBuilder sql = new StringBuilder("""
                 SELECT l.* from lead l
                 WHERE 1=1
