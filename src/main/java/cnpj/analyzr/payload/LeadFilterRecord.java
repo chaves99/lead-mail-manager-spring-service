@@ -1,5 +1,6 @@
 package cnpj.analyzr.payload;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public record LeadFilterRecord(
@@ -11,12 +12,13 @@ public record LeadFilterRecord(
         Boolean nameNotNull,
         Long lastIndex,
         Boolean shouldFetchUnsubscribed,
-        Boolean emailOpened) {
+        Boolean emailOpened,
+        LocalDate sentEmailBeforeDate) {
 
     public LeadFilterRecord withLimit(int pageSize) {
         return new LeadFilterRecord(pageSize, sentQuantity,
                 emailExclude, emailInclude, names,
                 nameNotNull, lastIndex, shouldFetchUnsubscribed,
-                emailOpened);
+                emailOpened, sentEmailBeforeDate);
     }
 }

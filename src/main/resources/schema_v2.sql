@@ -45,15 +45,3 @@ CREATE TABLE IF NOT EXISTS campaign_row(
 );
 CREATE INDEX campaign_row_index ON campaign_row(id);
 
- 
-SELECT
-    COUNT(cr.id) AS total,
-    COUNT(cr.id) FILTER (WHERE cr.status = 1) AS pending,
-    COUNT(cr.id) FILTER (WHERE cr.status = 2) AS success,
-    COUNT(cr.id) FILTER (WHERE cr.status > 2) AS error,
-    COUNT(cr.id) FILTER (WHERE cr.clicked IS TRUE) AS click,
-    COUNT(cr.id) FILTER (WHERE cr.opened IS TRUE) AS opened
-FROM campaign_row cr
-JOIN campaign c ON (cr.campaign_id = c.id)
-WHERE c.template_id = 3;
-

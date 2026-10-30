@@ -277,6 +277,11 @@ public class LeadRepository {
             query.append(") ");
         }
 
+        if (filter.sentEmailBeforeDate() != null) {
+            query.append(" AND l.last_send < :sendEmailBeforeDate ");
+            map.put("sendEmailBeforeDate", filter.sentEmailBeforeDate());
+        }
+
         if (filter.shouldFetchUnsubscribed() == null || !filter.shouldFetchUnsubscribed()) {
             query.append(" AND l.unsubscribed IS FALSE");
         }
