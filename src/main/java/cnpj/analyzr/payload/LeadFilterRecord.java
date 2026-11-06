@@ -9,7 +9,7 @@ public record LeadFilterRecord(
         List<String> emailExclude,
         List<String> emailInclude,
         List<String> names,
-        Boolean nameNotNull,
+        NameTypeFilter nameTypeFilter,
         Long lastIndex,
         Boolean shouldFetchUnsubscribed,
         Boolean emailOpened,
@@ -18,7 +18,12 @@ public record LeadFilterRecord(
     public LeadFilterRecord withLimit(int pageSize) {
         return new LeadFilterRecord(pageSize, sentQuantity,
                 emailExclude, emailInclude, names,
-                nameNotNull, lastIndex, shouldFetchUnsubscribed,
+                nameTypeFilter, lastIndex, shouldFetchUnsubscribed,
                 emailOpened, sentEmailBeforeDate);
+    }
+
+    public static enum NameTypeFilter {
+        NULL_NAME,
+        NOT_NULL_NAME;
     }
 }

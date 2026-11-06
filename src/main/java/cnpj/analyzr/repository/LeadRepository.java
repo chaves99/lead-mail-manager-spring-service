@@ -16,6 +16,7 @@ import org.springframework.stereotype.Repository;
 
 import cnpj.analyzr.controller.LeadController.LeadCreationRequest;
 import cnpj.analyzr.payload.DashboardStatusRecord.LeadTotal;
+import cnpj.analyzr.payload.LeadFilterRecord.NameTypeFilter;
 import cnpj.analyzr.payload.LeadFilterRecord;
 import cnpj.analyzr.payload.LeadRecord;
 import lombok.AllArgsConstructor;
@@ -238,9 +239,11 @@ public class LeadRepository {
         query.append(" AND l.id > ").append(filter.lastIndex()).append(" ");
         query.append(" AND (l.unreachable IS FALSE OR l.unreachable IS NULL) ");
 
-        if (filter.nameNotNull() != null && filter.nameNotNull()) {
+        if (NameTypeFilter.NULL_NAME.equals(filter.nameTypeFilter())) {
+            query.append(" AND l.name IS NULL ");
+        } else if (NameTypeFilter.NOT_NULL_NAME.equals(filter.nameTypeFilter())) {
             query.append(" AND l.name IS NOT NULL ");
-        } else if (filter.names() != null && !filter.names().isEmpty()) {
+        }else if (filter.names() != null && !filter.names().isEmpty()) {
             boolean first = true;
             query.append(" AND (");
             for (String token : filter.names()) {
