@@ -214,6 +214,7 @@ public class LeadRepository {
             map.put("limit", filter.pageSize());
         }
 
+        System.out.println("---> sql: " + sql);
         return executeQueryList(sql.toString(), map);
     }
 
@@ -240,7 +241,7 @@ public class LeadRepository {
         query.append(" AND (l.unreachable IS FALSE OR l.unreachable IS NULL) ");
 
         if (NameTypeFilter.NULL_NAME.equals(filter.nameTypeFilter())) {
-            query.append(" AND l.name IS NULL ");
+            query.append(" AND (l.name IS NULL OR l.name = '') ");
         } else if (NameTypeFilter.NOT_NULL_NAME.equals(filter.nameTypeFilter())) {
             query.append(" AND l.name IS NOT NULL ");
         }else if (filter.names() != null && !filter.names().isEmpty()) {
