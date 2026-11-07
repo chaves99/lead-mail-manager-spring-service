@@ -240,9 +240,9 @@ public class LeadRepository {
         query.append(" AND (l.unreachable IS FALSE OR l.unreachable IS NULL) ");
 
         if (NameTypeFilter.NULL_NAME.equals(filter.nameTypeFilter())) {
-            query.append(" AND (l.name IS NULL OR l.name = '') ");
+            query.append(" AND (l.name IS NULL OR TRIM(l.name) = '') ");
         } else if (NameTypeFilter.NOT_NULL_NAME.equals(filter.nameTypeFilter())) {
-            query.append(" AND l.name IS NOT NULL ");
+            query.append(" AND l.name IS NOT NULL AND TRIM(l.name) <> '' ");
         }else if (filter.names() != null && !filter.names().isEmpty()) {
             boolean first = true;
             query.append(" AND (");
