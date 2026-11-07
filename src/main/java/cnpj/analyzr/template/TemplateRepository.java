@@ -74,7 +74,7 @@ public class TemplateRepository {
 
     public List<Template> get() {
         String sql = """
-                SELECT * FROM template
+                SELECT * FROM template ORDER BY id
                 """;
 
         return jdbcTemplate.query(sql, (rs, rowNum) -> {

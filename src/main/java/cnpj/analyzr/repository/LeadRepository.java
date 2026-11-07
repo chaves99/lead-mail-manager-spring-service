@@ -214,7 +214,6 @@ public class LeadRepository {
             map.put("limit", filter.pageSize());
         }
 
-        System.out.println("---> sql: " + sql);
         return executeQueryList(sql.toString(), map);
     }
 
